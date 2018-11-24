@@ -5,6 +5,26 @@ local
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+   fun{IsTransfo X}
+      if{Record.is X}then
+	 case X
+	 of duration(seconds:S B) then true
+	 [] stretch(factor:S B) then true
+	 [] drone(note:S amount:B)then true
+	 []transpose(semitones:S B)then true
+	 else false
+	 end
+      end
+   end
+   fun{Transform X}
+      case X
+      of duration(seconds:S B) then %appel a la fct duration
+      [] stretch(factor:S B) then %appel a la fct stretch
+      [] drone(note:S amount:B)then %appel a drone
+      []transpose(semitones:S B)then %appel a transpose
+      else false
+      end
+   end
    fun{IsNote X}
       if{Tuple.is X}then true
       elseif {Atom.is X}then true
@@ -26,10 +46,25 @@ local
       
    end
 
-   
-
-   fun{IsChord X}
+   fun{IsChord X} %ATTENTION SI IL RECOIT UNE PARTITION IL ENVOIE TRUE
+      case X
+      of H|T then
+	 if {IsNote H} then
+	    true
+	 elseif {IsExtNote H} then
+	    true
+	 else
+	    false
+	 end
+      else false
+      end
    end
+
+
+   
+%---------------------ZONE DES TRANSFORMATIONS ----------------------
+
+%----------------------END ZONE DES TRANSFORMATIONS-------------------
    
    % Translate a note to the extended notation.
    fun {NoteToExtended Note}
