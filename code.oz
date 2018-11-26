@@ -4,7 +4,7 @@ local
    Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%%LOL%%
    fun{IsTransfo X}
       if{Record.is X}then
 	 case X
