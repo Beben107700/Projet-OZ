@@ -11,12 +11,13 @@ local
    fun{IsTransfo X}
       if{Record.is X}then
 	 case X
-	 of duration(seconds:S B) then true
+	 of duration(seconds:S B) then true %%ATTANTION On ne verifie pas si B est une partition
 	 [] stretch(factor:S B) then true
 	 [] drone(note:S amount:B)then true
 	 []transpose(semitones:S B)then true
 	 else false
 	 end
+      else false
       end
    end
    fun{Transform X}
@@ -50,7 +51,7 @@ local
    end
 
    fun{IsChord X} %ATTENTION SI IL RECOIT UNE PARTITION IL ENVOIE TRUE
-      case X
+      case X %C'est ok selon l'énoncé
       of H|T then
 	 if {IsNote H} then
 	    true
@@ -64,7 +65,15 @@ local
    end
 
    fun{IsExtChord X} then
-      %Faut qu'on vérifie aussi si c'est un ext chord
+      case X %C'est ok selon l'énoncé
+      of H|T then
+	 if {IsExtNote H} then
+	    true
+	 else
+	    false
+	 end
+      else false
+      end
    end
    
    
@@ -136,14 +145,17 @@ fun {PartitionToTimedList Partition}
 	 elseif {IsExtNote N} then Tlist := {List.append @Tlist N $}
 	 elseif {IsChord N} then Tlist := {List.append @Tlist {ChordToExtended N} $ }
 	 elseif {IsExtChord N } then Tlist := {List.append @Tlist N }
-	 elseif {IsTrans N }then
-	       % % % % % % Les transformations
+	 elseif {IsTrans N }then {Transform N}
 	    
 	 else
 	    skip %%%Si le type de N n'est pas reconnu
-	 end
-	 
-      end
+	 end %end du if
+      end %end du for
+      @Tlist
+   end%end du local
+   
+end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
