@@ -5,6 +5,9 @@ local
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%bien le bonsoir
 %%%%
+
+%%J'ai 3 litres de lait
+
    fun{IsTransfo X}
       if{Record.is X}then
 	 case X
