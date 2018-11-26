@@ -1,4 +1,4 @@
-local 
+local
    % See project statement for API details.
    [Project] = {Link ['Project2018.ozf']}
    Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
@@ -22,10 +22,10 @@ local
    end
    fun{Transform X}
       case X
-      of duration(seconds:S B) then %appel a la fct duration
-      [] stretch(factor:S B) then %appel a la fct stretch
-      [] drone(note:S amount:B)then %appel a drone
-      []transpose(semitones:S B)then %appel a transpose
+      of duration(seconds:S B) then skip%appel a la fct duration
+      [] stretch(factor:S B) then {Stretch B S}%appel a la fct stretch
+      [] drone(note:S amount:B)then skip%appel a drone
+      []transpose(semitones:S B)then skip%appel a transpose
       else false
       end
    end
@@ -64,7 +64,7 @@ local
       end
    end
 
-   fun{IsExtChord X} then
+   fun{IsExtChord X} 
       case X %C'est ok selon l'énoncé
       of H|T then
 	 if {IsExtNote H} then
@@ -82,7 +82,19 @@ local
 %---------------------ZONE DES TRANSFORMATIONS ----------------------
 
    fun{Stretch Fact Part}
-      
+      local ExtPartit in
+	 ExtPartit = {PartitionToTimedList Partit}
+	 C = {NewCell nil}
+	 for S in ExtPartit do
+	    if {IsExtNote S} then
+	       C:= {List.append @C note(name:S.name duration:Fact*S.duration octave:S.octave sharp:S.sharp instrument:S.instrument) $}
+	    elseif {IsExtChord S} then {Stretch S Facteur}
+	    else
+	       skip%SI TU AS UNE TRANSFORMATION CEST LE BORDEL
+	    end    
+	 end%end du for
+	 @C %On rend ici la liste avec les notes multiplees
+      end%end du local
    end
    
 
@@ -132,60 +144,67 @@ local
    
    
    
-end
 
-fun {PartitionToTimedList Partition}
+   fun {PartitionToTimedList Partition}
       %NB: Partition est une liste [a1 a2 a3 a4]
       %ai représente soit une note|chord|extendednote|extendedchord|transformation
-   
-   local Tlist in 
-      Tlist = {NewCell nil} %liste
-      for N in Partition do
-	 if {IsNote N} then Tlist := {List.append @Tlist {NoteToExtended N} $ }
-	 elseif {IsExtNote N} then Tlist := {List.append @Tlist N $}
-	 elseif {IsChord N} then Tlist := {List.append @Tlist {ChordToExtended N} $ }
-	 elseif {IsExtChord N } then Tlist := {List.append @Tlist N }
-	 elseif {IsTrans N }then {Transform N}
-	    
-	 else
-	    skip %%%Si le type de N n'est pas reconnu
-	 end %end du if
-      end %end du for
-      @Tlist
-   end%end du local
-   
-end
+      
+      local Tlist in 
+	 Tlist = {NewCell nil} %liste
+	 for N in Partition do
+	    if {IsNote N} then Tlist := {List.append @Tlist {NoteToExtended N} $ }
+	    elseif {IsExtNote N} then Tlist := {List.append @Tlist N $}
+	    elseif {IsChord N} then Tlist := {List.append @Tlist {ChordToExtended N} $ }
+	    elseif {IsExtChord N } then Tlist := {List.append @Tlist N }
+	    elseif {IsTrans N }then {Transform N}
+	       
+	    else
+	       skip %%%Si le type de N n'est pas reconnu
+	    end %end du if
+	 end %end du for
+	 @Tlist
+      end%end du local
+      
+   end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-      fun {Mix P2T Music}
+   fun {Mix P2T Music}
       % TODO
-	 {Project.readFile 'wave/animaux/cow.wav'}
-      end
+      {Project.readFile 'wave/animaux/cow.wav'}
+   end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-      Music = {Project.load 'joy.dj.oz'}
-      Start
+     % Music = {Project.load 'joy.dj.oz'}
+    %  Start
 
    % Uncomment next line to insert your tests.
    % \insert 'tests.oz'
    % !!! Remove this before submitting.
-   in
-      Start = {Time}
+in
+   %BEN DELCOIGNE A COMMENTE LA LIGNE SUIVANTE
+      %Start = {Time}
 
    % Uncomment next line to run your tests.
    % {Test Mix PartitionToTimedList}
 
    % Add variables to this list to avoid "local variable used only once"
    % warnings.
-      {ForAll [NoteToExtended Music] Wait}
-      
+
+      %BEN DELCOIGNE A COMMENTE LA LIGNE SUIVANTE
+     % {ForAll [NoteToExtended Music] Wait}
+   
    % Calls your code, prints the result and outputs the result to `out.wav`.
    % You don't need to modify this.
-      {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
-      
+
+      %BEN DELCOIGNE A COMMENTE LA LIGNE SUIVANTE
+      %{Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
+   
    % Shows the total time to run your code.
-      {Browse {IntToFloat {Time}-Start} / 1000.0}
-   end
+   %{Browse {IntToFloat {Time}-Start} / 1000.0}
+end
+
+
+
