@@ -83,20 +83,48 @@ end
 
 fun{Stretch Fact Part}
    local ExtPartit C in
-      ExtPartit = {PartitionToTimedList Part}
+      ExtPart = {PartitionToTimedList Part}
       C = {NewCell nil}
-      for S in ExtPartit do
+      for S in ExtPart do
 	 if {IsExtNote S} then
 	    C:= {List.append @C note(name:S.name duration:Fact*S.duration octave:S.octave sharp:S.sharp instrument:S.instrument) $}
-	 elseif {IsExtChord S} then {Stretch S Fact}
+	 elseif {IsExtChord S} then C:= {List.append @C {Stretch S Fact} $ }
 	 else
-	    skip%SI TU AS UNE TRANSFORMATION CEST LE BORDEL
+	    skip %SI TU AS UNE TRANSFORMATION CEST LE BORDEL
 	 end    
       end%end du for
       @C %On rend ici la liste avec les notes multiplees
    end%end du local
 end
 
+fun {Duration Sec Part}
+	local Fact in
+	Fact = Sec/{GetDuration Part}
+	{Stretch Fact Part}
+	end
+	end
+	
+	  
+	  end
+end
+fun {GetDuration Part}
+	local Time ExtPart in
+		{Newcell Time 0}
+		ExtPartit = {PartitionToTimedList Part}
+		for S in ExtPart do
+			if {isExtChord S} then
+				C:= @C + S.1.duration
+			elseif {isExtNote S} then
+				C:= @C + S.duration	
+			else
+				skip
+				end
+				end
+				@C
+				end
+				end
+		
+	  
 
 %----------------------END ZONE DES TRANSFORMATIONS-------------------
 
@@ -127,17 +155,13 @@ end
 fun {ChordToExtended Chord}
       %Chord est une MOTHERFUKING LISTE H|T
       %On doit renvoyer une MOTHERFUCKING LISTE qui comprend des EXTENDED NOTE
-   local C in
-      C = {NewCell nil}
-      for X in Chord do
-	 if {IsExtNote X} then
-	    C:= X|@C
-	 else
-	    C := {NoteToExtended X}|@C
-	 end
-	 
-      end
+   case Chord
+   of nil then nil
+   [] H|T then
+      {NoteToExtended H}|{ChordToExtended T}
    end
+   
+   
 end
 
 

@@ -1,4 +1,4 @@
-declare IsTrans Transform IsNote IsExtNote IsChord IsExtChord Stretch NoteToExtended ChordToExtended PartitionToTimedList Mix
+declare IsTrans Transform IsNote IsExtNote IsChord IsExtChord Stretch NoteToExtended ChordToExtended PartitionToTimedList Mix Drone
    % See project statement for API details.
  %  [Project] = {Link ['Project2018.ozf']}
   % Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
@@ -82,10 +82,10 @@ end
 %---------------------ZONE DES TRANSFORMATIONS ----------------------
 
 fun{Stretch Fact Part}
-   local ExtPartit C in
-      ExtPartit = {PartitionToTimedList Part}
+   local ExtPart C in
+      ExtPart = {PartitionToTimedList Part}
       C = {NewCell nil}
-      for S in ExtPartit do
+      for S in ExtPart do
 	 if {IsExtNote S} then
 	    C:= {List.append @C note(name:S.name duration:Fact*S.duration octave:S.octave sharp:S.sharp instrument:S.instrument) $}
 	 elseif {IsExtChord S} then C:= {List.append @C {Stretch S Fact} $ }
@@ -96,6 +96,42 @@ fun{Stretch Fact Part}
       @C %On rend ici la liste avec les notes multiplees
    end%end du local
 end
+
+fun {Duration Sec Part}
+   local Fact in
+      Fact = Sec/{GetDuration Part}
+      {Stretch Fact Part}
+   end
+end
+
+fun {GetDuration Part}
+   local C ExtPart in
+      C = {NewCell 0}
+      ExtPart = {PartitionToTimedList Part}
+      for S in ExtPart do
+	 if {IsExtChord S} then
+	    C:= @C + S.1.duration
+	 elseif {IsExtNote S} then
+	    C:= @C + S.duration	
+	 else
+	    skip
+	 end
+      end
+      @C
+   end
+end
+fun {Drone Note Amount}
+   local C ExtPart in
+      C = {NewCell nil}
+      for I in 1..Amount do
+	 C:={List.append @C Note $}
+      end
+      @C
+   end
+end
+
+	 
+	 
 
 
 %----------------------END ZONE DES TRANSFORMATIONS-------------------
