@@ -81,21 +81,34 @@ end
 
 %---------------------ZONE DES TRANSFORMATIONS ----------------------
 
-fun{Stretch Fact Part}
-   local ExtPart C in
+fun{Stretch Fact Part}   
+   local StretchExt ExtPart in
       ExtPart = {PartitionToTimedList Part}
-      C = {NewCell nil}
-      for S in ExtPart do
-	 if {IsExtNote S} then
-	    C:= {List.append @C note(name:S.name duration:Fact*S.duration octave:S.octave sharp:S.sharp instrument:S.instrument) $}
-	 elseif {IsExtChord S} then C:= {List.append @C {Stretch S Fact} $ }
+      fun {StretchExt Fact EPart}
+	 case EPart of nil then nil
+	 [] H|T then if {IsExtNote H} then
+			{H.duration} := {Fact*H.duration}
+		     elseif {IsExtChord H} then
+			for S in H
+			   {S.duration} := {Fact*S.duration}
+			end
+		     else
+			skip % erreur ni note ni chord => transormation
+		     end
+	    H|{StretchExt Fact T}
 	 else
-	    skip %SI TU AS UNE TRANSFORMATION CEST LE BORDEL
-	 end    
-      end%end du for
-      @C %On rend ici la liste avec les notes multiplees
-   end%end du local
-end
+	    skip
+	 end
+      end
+      {StretchExt Fact ExtPart}
+   end
+end   
+
+
+		      
+		      
+		      
+     
 
 fun {Duration Sec Part}
    local Fact in

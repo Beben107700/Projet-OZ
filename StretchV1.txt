@@ -1,0 +1,15 @@
+fun{Stretch Fact Part}
+   local ExtPart C in
+      ExtPart = {PartitionToTimedList Part}
+      C = {NewCell nil}
+      for S in ExtPart do
+	 if {IsExtNote S} then
+	    C:= {List.append @C note(name:S.name duration:Fact*S.duration octave:S.octave sharp:S.sharp instrument:S.instrument) $}
+	 elseif {IsExtChord S} then C:= {List.append @C {Stretch S Fact} $ }
+	 else
+	    skip %SI TU AS UNE TRANSFORMATION CEST LE BORDEL
+	 end    
+      end%end du for
+      @C %On rend ici la liste avec les notes multiplees
+   end%end du local
+end

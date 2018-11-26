@@ -1,9 +1,9 @@
-declare IsTrans Transform IsNote IsExtNote IsChord IsExtChord Stretch NoteToExtended ChordToExtended PartitionToTimedList Mix
+declare IsTrans Transform IsNote IsExtNote IsChord IsExtChord Stretch NoteToExtended ChordToExtended PartitionToTimedList Mix Drone
    % See project statement for API details.
  %  [Project] = {Link ['Project2018.ozf']}
   % Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%bien le bonsoir
 %%%%
 
 %%J'ai 3 litres de lait
@@ -82,7 +82,7 @@ end
 %---------------------ZONE DES TRANSFORMATIONS ----------------------
 
 fun{Stretch Fact Part}
-   local ExtPartit C in
+   local ExtPart C in
       ExtPart = {PartitionToTimedList Part}
       C = {NewCell nil}
       for S in ExtPart do
@@ -98,33 +98,41 @@ fun{Stretch Fact Part}
 end
 
 fun {Duration Sec Part}
-	local Fact in
-	Fact = Sec/{GetDuration Part}
-	{Stretch Fact Part}
-	end
-	end
-	
-	  
-	  end
+   local Fact in
+      Fact = Sec/{GetDuration Part}
+      {Stretch Fact Part}
+   end
 end
+
 fun {GetDuration Part}
-	local Time ExtPart in
-		{Newcell Time 0}
-		ExtPartit = {PartitionToTimedList Part}
-		for S in ExtPart do
-			if {isExtChord S} then
-				C:= @C + S.1.duration
-			elseif {isExtNote S} then
-				C:= @C + S.duration	
-			else
-				skip
-				end
-				end
-				@C
-				end
-				end
-		
-	  
+   local C ExtPart in
+      C = {NewCell 0}
+      ExtPart = {PartitionToTimedList Part}
+      for S in ExtPart do
+	 if {IsExtChord S} then
+	    C:= @C + S.1.duration
+	 elseif {IsExtNote S} then
+	    C:= @C + S.duration	
+	 else
+	    skip
+	 end
+      end
+      @C
+   end
+end
+fun {Drone Note Amount}
+   local C ExtPart in
+      C = {NewCell nil}
+      for I in 1..Amount do
+	 C:={List.append @C Note $}
+      end
+      @C
+   end
+end
+
+	 
+	 
+
 
 %----------------------END ZONE DES TRANSFORMATIONS-------------------
 
