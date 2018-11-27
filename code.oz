@@ -81,24 +81,20 @@ end
 %---------------------ZONE DES TRANSFORMATIONS ----------------------
 
 fun{Stretch Fact Part}   
-   local StretchExt ExtPart in
-      ExtPart = {PartitionToTimedList Part}
-
+   local StretchExt in
       
       fun {StretchExt Fact EPart}
 	 case EPart of nil then nil
 	 [] H|T then if {IsExtNote H} then
 			note(name:H.name duration:Fact*H.duration octave:H.octave sharp:H.sharp instrument:H.instrument)|{StretchExt Fact T}	
-		     elseif {IsExtChord H} then % H est une liste de note donc on peut lui appliquer stretch
+		     else % H est une liste de note donc on peut lui appliquer stretch
 			{Stretch Fact H}|{Stretch Fact T}          %{List.append {Stretch Fact H} {Stretch Fact T} $ }
-		     else
-			{Stretch Fact T} % ni note ni chord => transormation, on passe à l'element suivant
-		     end%fin du if
+		     end
 	 end%fin case
       end%fin fct
 
       
-      {StretchExt Fact ExtPart}
+      {StretchExt Fact {PartitionToTimedList Part}}
    end%fin du local
 end   
 
@@ -262,7 +258,7 @@ fun {PartitionToTimedList Partition}
 	    elseif {IsExtChord H} then  H|{ExtendedPart T}
 	    elseif {IsTrans H} then {List.append {Transform H} {ExtendedPart T} $} %on utilise append car en fin de Transform il y a un nil qu'on ne veut pas
 	    else
-	       {ExtendedPart T}
+	       %{ExtendedPart T}
 	    end%fin du if
 	 else
 	    nil %WALLAY si c'est rien
@@ -271,7 +267,7 @@ fun {PartitionToTimedList Partition}
       {ExtendedPart Partition}
    end
 end
-
+{Browse {Stretch 4.0 [a [a a] b]}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 fun {Mix P2T Music}
@@ -281,7 +277,6 @@ fun {Mix P2T Music}
 end
 %{Browse {Duration 4.0 [a a]}}
 %{Browse {Transpose 1 [c1 d1 e1]}}
-{Browse {Stretch 3.5 [a [{NoteToExtended c} {NoteToExtended c}] a]}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
