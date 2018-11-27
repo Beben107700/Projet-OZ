@@ -1,0 +1,37 @@
+fun {GetNumber ExtNote}
+   case ExtNote.name of 'c' then 
+      if ExtNote.sharp then 2+ 12*ExtNote.octave % do#
+      else 1 + 12*ExtNote.octave  %do
+      end
+   [] 'd' then
+      if ExtNote.sharp then 4+ 12*ExtNote.octave  %re#
+      else  3+ 12*ExtNote.octave %re
+      end
+   [] 'e' then
+      5  %mi (mi # c'est fa)
+   [] 'f' then
+      if ExtNote.sharp then 7+ 12*ExtNote.octave  % fa#
+      else 6 + 12*ExtNote.octave  %fa
+      end
+   [] 'g' then
+      if ExtNote.sharp then 9+ 12*ExtNote.octave  % sol#
+      else  8 + 12*ExtNote.octave %sol
+      end
+   [] 'a' then
+      if ExtNote.sharp then 11+ 12*ExtNote.octave  %la#
+      else  10+ 12*ExtNote.octave  %la
+      end
+   [] 'b' then
+      12 + 12*ExtNote.octave %si
+   end
+end
+fun {GetNote I}
+   local Tab Oct N in
+      N = I mod 12 %numéro de la note entre 0 et 11
+      %Dièse = N mod 2 % 1 si #
+      Tab = migEtben(0:b 1:c 2:c 3:d 4:d 5:e 6:f 7:f 8:g 9:g 10:a 11:a)
+      Oct = (I div 12)+1
+      IsSharp = (I==1 or I==3 or I==6 or I==8 or I==10)
+      note(name:Tab.N duration:1.0 octave:Oct sharp:IsSharp instrument:none)
+   end
+end
