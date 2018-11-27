@@ -20,15 +20,18 @@ fun{IsTrans X}
    else false
    end
 end
+
 fun{Transform X}
    case X
    of duration(seconds:S B) then {Duration S B}%appel a la fct duration
    [] stretch(factor:S B) then {Stretch B S}%appel a la fct stretch
    [] drone(note:S amount:B)then {Drone S B}%appel a drone
-   []transpose(semitones:S B)then true%appel a transpose
+   [] transpose(semitones:S B)then true%appel a transpose
    else false
    end
 end
+
+{Browse {Drone a 5}}
 fun{IsNote X}
    if{Tuple.is X}then true
    elseif {Atom.is X}then true
@@ -130,16 +133,6 @@ fun {GetDuration Part}
       {GetDur {PartitionToTimedList Part}}
    end
 end
-fun {Drone Note Amount}
-   local C ExtPart in
-      C = {NewCell nil}
-      for I in 1..Amount do
-	 C:={List.append @C Note $}
-      end
-      @C
-   end
-end
-declare Drone
 fun{Drone Note Amount}
 	local Recurs  ExtN in
 		if {IsNote Note} then ExtN = {NoteToExtended Note}

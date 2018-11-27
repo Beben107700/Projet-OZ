@@ -139,8 +139,21 @@ fun {Drone Note Amount}
       @C
    end
 end
-
-	 
+declare Drone
+fun{Drone Note Amount}
+	local Recurs  ExtN in
+		if {IsNote Note} then ExtN = {NoteToExtended Note}
+		else ExtN = Note end	
+		fun {Recurs N}
+			if N < Amount then
+				Note|{Recurs N+1}
+			else %n == amount
+				Note|nil
+			end
+		end %fct
+		{Recurs 1}
+	end%local
+end
 	 
 
 
@@ -177,6 +190,8 @@ fun {ChordToExtended Chord}
    of nil then nil
    [] H|T then
       {NoteToExtended H}|{ChordToExtended T}
+   else
+      nil
    end
    
    
@@ -201,13 +216,14 @@ fun {PartitionToTimedList Partition}
 	    elseif {IsTrans H} then {List.append {Transform H} {ExtendedPart T} $} %on utilise append car en fin de Transform il y a un nil qu'on ne veut pas
 	    else
 	       {ExtendedPart T}
-	    end
-	 end
-      end
+	    end%fin du if
+	 else
+	    nil %WALLAY si c'est rien
+	 end%fin du case
+      end%fin du local
       {ExtendedPart Partition}
    end
 end
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -217,6 +233,8 @@ fun {Mix P2T Music}
    %{Project.readFile 'wave/animaux/cow.wav'}
    true
 end
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
      % Music = {Project.load 'joy.dj.oz'}
