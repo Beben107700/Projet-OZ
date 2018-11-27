@@ -139,8 +139,21 @@ fun {Drone Note Amount}
       @C
    end
 end
-
-	 
+declare Drone
+fun{Drone Note Amount}
+	local Recurs  ExtN in
+		if {IsNote Note} then ExtN = {NoteToExtended Note}
+		else ExtN = Note end	
+		fun {Recurs N}
+			if N < Amount then
+				Note|{Recurs N+1}
+			else %n == amount
+				Note|nil
+			end
+		end %fct
+		{Recurs 1}
+	end%local
+end
 	 
 
 
@@ -209,7 +222,6 @@ fun {PartitionToTimedList Partition}
 end
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 fun {Mix P2T Music}
@@ -217,6 +229,8 @@ fun {Mix P2T Music}
    %{Project.readFile 'wave/animaux/cow.wav'}
    true
 end
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
      % Music = {Project.load 'joy.dj.oz'}
