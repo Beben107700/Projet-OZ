@@ -1,4 +1,4 @@
-declare IsTrans Transform IsNote IsExtNote IsChord IsExtChord Stretch NoteToExtended ChordToExtended PartitionToTimedList Mix Drone GetDuration Transpose
+declare IsTrans Transform IsNote IsExtNote IsChord IsExtChord Stretch NoteToExtended ChordToExtended PartitionToTimedList Mix Drone GetDuration GetNote GetNumber Transpose
    % See project statement for API details.
  %  [Project] = {Link ['Project2018.ozf']}
   % Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
@@ -136,8 +136,8 @@ fun{Drone Note Amount}
 	 end
 		end %fct
 
-		
-		{Recurs 1}
+      
+      {Recurs 1}
    end%local
 end
 
@@ -146,7 +146,7 @@ fun{Transpose Semiton Part}
       fun{Recurs Reste}
 	 case Reste 
 	 of H|T then
-	    {GetNote {GetNumber H}+Semiton}|{Recurs T}
+	    {GetNote {GetNumber {NoteToExtended H}}+Semiton}|{Recurs T}
 	 []nil then nil
 	 end%Case
       end%fct
@@ -154,7 +154,55 @@ fun{Transpose Semiton Part}
       {Recurs Part}
    end%local
 end%fct
+fun {GetNumber ExtNote}
+   case ExtNote.name of 'c' then 
+      if ExtNote.sharp then 2+ 12*(ExtNote.octave-1) % do#
+      else 1 + 12*(ExtNote.octave -1 ) %do
+      end
+   [] 'd' then
+      if ExtNote.sharp then 4+ 12*(ExtNote.octave-1)  %re#
+      else  3+ 12*(ExtNote.octave -1 ) %re
+      end
+   [] 'e' then
+      5  +12*(ExtNote.octave -1 )%mi (mi # c'est fa)
+   [] 'f' then
+      if ExtNote.sharp then 7+ 12*(ExtNote.octave-1)  % fa#
+      else 6 + 12*(ExtNote.octave -1 ) %fa
+      end
+   [] 'g' then
+      if ExtNote.sharp then 9+ 12*(ExtNote.octave-1)  % sol#
+      else  8 + 12*(ExtNote.octave -1 ) %sol
+      end
+   [] 'a' then
+      if ExtNote.sharp then 11+ 12*(ExtNote.octave-1)  %la#
+      else  10+ 12*(ExtNote.octave -1 ) %la
+      end
+   [] 'b' then
+      12 + 12*(ExtNote.octave -1 ) %si
+   end
+end
+fun {GetNote I}
+   local Tab Oct N IsSharp in
+      fun{IsSharp U}
+	 case U
+	 of 2 then true
+	 [] 4 then true
+	 []7 then true
+	 []9 then true
+	 []11 then true
+	 else false
+	 end
+	 
+      end
+      
+      N = I mod 12 %numéro de la note entre 0 et 11
+      %Dièse = N mod 2 % 1 si #
+      Tab = migEtben(0:b 1:c 2:c 3:d 4:d 5:e 6:f 7:f 8:g 9:g 10:a 11:a)
+      Oct = (I div 12)+1
 
+      note(name:Tab.N duration:1.0 octave:Oct sharp:{IsSharp N} instrument:none)
+   end
+end
 
 %----------------------END ZONE DES TRANSFORMATIONS-------------------
 
@@ -231,7 +279,9 @@ fun {Mix P2T Music}
    %{Project.readFile 'wave/animaux/cow.wav'}
    true
 end
-{Browse {Duration 4.0 [a a]}}
+%{Browse {Duration 4.0 [a a]}}
+{Browse {Transpose 1 [c1 d1 e1]}}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
      % Music = {Project.load 'joy.dj.oz'}
