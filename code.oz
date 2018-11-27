@@ -1,4 +1,4 @@
-declare IsTrans Transform IsNote IsExtNote IsChord IsExtChord Stretch NoteToExtended ChordToExtended PartitionToTimedList Mix Drone GetDuration
+declare IsTrans Transform IsNote IsExtNote IsChord IsExtChord Stretch NoteToExtended ChordToExtended PartitionToTimedList Mix Drone GetDuration Transpose
    % See project statement for API details.
  %  [Project] = {Link ['Project2018.ozf']}
   % Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
@@ -110,12 +110,7 @@ fun {GetDuration List}
 	 case Reste
 	 of nil then Acc
 	 [] H|T then {Accumulateur H.duration+Acc T}
-	 end
-	 
-	 
-	 
-
-      end %local
+	 end      end %local
       {Accumulateur 0.0 {PartitionToTimedList List}}
    end
 end
@@ -143,9 +138,22 @@ fun{Drone Note Amount}
 
 		
 		{Recurs 1}
-	end%local
+   end%local
 end
-	 
+
+fun{Transpose Semiton Part}
+   local Recurs in
+      fun{Recurs Reste}
+	 case Reste 
+	 of H|T then
+	    {GetNote {GetNumber H}+Semiton}|{Recurs T}
+	 []nil then nil
+	 end%Case
+      end%fct
+      
+      {Recurs Part}
+   end%local
+end%fct
 
 
 %----------------------END ZONE DES TRANSFORMATIONS-------------------
