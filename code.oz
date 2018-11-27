@@ -22,9 +22,9 @@ fun{IsTrans X}
 end
 fun{Transform X}
    case X
-   of duration(seconds:S B) then true%appel a la fct duration
+   of duration(seconds:S B) then {Duration S B}%appel a la fct duration
    [] stretch(factor:S B) then {Stretch B S}%appel a la fct stretch
-   [] drone(note:S amount:B)then true%appel a drone
+   [] drone(note:S amount:B)then {Drone S B}%appel a drone
    []transpose(semitones:S B)then true%appel a transpose
    else false
    end
@@ -35,15 +35,12 @@ fun{IsNote X}
    else false
    end
 end
-
-
 fun{IsExtNote X}
    if{Record.is X} then
       case X
       of note(name:A octave:B sharp:C duration:D instrument:E) then true
       else false
       end
-      
    else
       false
    end
@@ -84,19 +81,23 @@ end
 fun{Stretch Fact Part}   
    local StretchExt ExtPart in
       ExtPart = {PartitionToTimedList Part}
+
+      
       fun {StretchExt Fact EPart}
 	 case EPart of nil then nil
 	 [] H|T then if {IsExtNote H} then
-			notenote(name:H.name duration:Fact*H.duration octave:H.octave sharp:H.sharp instrument:H.instrument)|{StretchExt Fact T}	
+			note(name:H.name duration:Fact*H.duration octave:H.octave sharp:H.sharp instrument:H.instrument)|{StretchExt Fact T}	
 		     elseif {IsExtChord H} then % H est une liste de note donc on peut lui appliquer stretch
 			{Stretch Fact H}|{Stretch Fact T}
 		     else
 			{Stretch Fact T} % ni note ni chord => transormation, on passe à l'element suivant
-		     end
-	 end
-      end
+		     end%fin du if
+	 end%fin case
+      end%fin fct
+
+      
       {StretchExt Fact ExtPart}
-   end
+   end%fin du local
 end   
 
 
@@ -113,8 +114,7 @@ fun {Duration Sec Part}
 end
 
 fun {GetDuration Part}
-   local GetDur ExtPart in
-      ExtPart = {PartitionToTimedList Part}
+   local GetDur in
       fun {GetDur EPart}
 	 case EPart of nil then nil
 	 [] H|T then
@@ -126,12 +126,10 @@ fun {GetDuration Part}
 	       {GetDur T}
 	    end
 	 end
-	 
       end
-      {GetDur ExtPart}
+      {GetDur {PartitionToTimedList Part}}
    end
 end
-
 fun {Drone Note Amount}
    local C ExtPart in
       C = {NewCell nil}
@@ -196,7 +194,7 @@ fun {PartitionToTimedList Partition}
    local Tlist in 
       Tlist = {NewCell nil} %liste
       for N in Partition do
-	 if {IsNote N} then Tlist := {List.append @Tlist {NoteToExtended N} $ }
+	 if {IsNote N} then Tlist := {List.append @Tlist {NoteToExtended N} $}
 	 elseif {IsExtNote N} then Tlist := {List.append @Tlist N $}
 	 elseif {IsChord N} then Tlist := {List.append @Tlist {ChordToExtended N} $ }
 	 elseif {IsExtChord N } then Tlist := {List.append @Tlist N }
@@ -218,7 +216,6 @@ fun {Mix P2T Music}
    %{Project.readFile 'wave/animaux/cow.wav'}
    true
 end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
      % Music = {Project.load 'joy.dj.oz'}
