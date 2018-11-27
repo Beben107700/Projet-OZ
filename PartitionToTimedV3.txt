@@ -1,0 +1,44 @@
+fun {PartitionToTimedList Partition}
+      %NB: Partition est une liste [a1 a2 a3 a4]
+      %ai représente soit une note|chord|extendednote|extendedchord|transformation
+   local ExtendedPart in
+      fun {ExtendedPart Part}
+	 case Part of nil then nil%fin de liste
+	 [] H|T then
+	    if {IsNote H} then {NoteToExtended H}|{ExtendedPart T}
+	    elseif {IsExtNote H} then H|{ExtendedPart T}
+	    elseif {IsChord H} then {ChordToExtended H}|{ExtendedPart T}
+	    elseif {IsExtChord H} then  H|{ExtendedPart T}
+	    elseif {IsTrans H} then {List.append {Transform H} {ExtendedPart T} $} %on utilise append car en fin de Transform il y a un nil qu'on ne veut pas
+	    else
+	       {ExtendedPart T}%tourne en boucle ici
+	    end%fin du if
+	 else
+	    nil %WALLAY si c'est rien
+	 end
+      end
+      {ExtendedPart Partition}
+   end
+end
+
+
+   local ExtendedPart in
+      fun{ExtendedPart Part}
+	 case Part
+	 of nil then nil
+	 []H|T then
+	    if {IsExtNote H} then
+	       H|{ExtendedPart T}
+	    elseif {IsNote H} then
+	       {NoteToExtended H}|{ExtendedPart T}
+	    elseif {IsExtChord H} then
+	       H|{ExtendedPart T}
+	    elseif {IsChord H} then
+	       {ChordToExtended H}|{ExtendedPart T}
+	    else
+	       {Append {Transform H} {ExtendedPart }}
+	    end    
+	 end	 
+      end
+      {ExtendedPart Partition}
+   end
