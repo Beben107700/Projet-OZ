@@ -190,6 +190,8 @@ fun {ChordToExtended Chord}
    of nil then nil
    [] H|T then
       {NoteToExtended H}|{ChordToExtended T}
+   else
+      nil
    end
    
    
@@ -214,9 +216,11 @@ fun {PartitionToTimedList Partition}
 	    elseif {IsTrans H} then {List.append {Transform H} {ExtendedPart T} $} %on utilise append car en fin de Transform il y a un nil qu'on ne veut pas
 	    else
 	       {ExtendedPart T}
-	    end
-	 end
-      end
+	    end%fin du if
+	 else
+	    nil %WALLAY si c'est rien
+	 end%fin du case
+      end%fin du local
       {ExtendedPart Partition}
    end
 end
