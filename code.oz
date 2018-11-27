@@ -90,7 +90,7 @@ fun{Stretch Fact Part}
 	 [] H|T then if {IsExtNote H} then
 			note(name:H.name duration:Fact*H.duration octave:H.octave sharp:H.sharp instrument:H.instrument)|{StretchExt Fact T}	
 		     elseif {IsExtChord H} then % H est une liste de note donc on peut lui appliquer stretch
-			{List.append {Stretch Fact H} {Stretch Fact T} $ }
+			{Stretch Fact H}|{Stretch Fact T}          %{List.append {Stretch Fact H} {Stretch Fact T} $ }
 		     else
 			{Stretch Fact T} % ni note ni chord => transormation, on passe à l'element suivant
 		     end%fin du if
@@ -280,7 +280,8 @@ fun {Mix P2T Music}
    true
 end
 %{Browse {Duration 4.0 [a a]}}
-{Browse {Transpose 1 [c1 d1 e1]}}
+%{Browse {Transpose 1 [c1 d1 e1]}}
+{Browse {Stretch 3.5 [a [{NoteToExtended c} {NoteToExtended c}] a]}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
