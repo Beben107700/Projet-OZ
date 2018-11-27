@@ -190,23 +190,24 @@ end
 fun {PartitionToTimedList Partition}
       %NB: Partition est une liste [a1 a2 a3 a4]
       %ai représente soit une note|chord|extendednote|extendedchord|transformation
-   
-   local Tlist in 
-      Tlist = {NewCell nil} %liste
-      for N in Partition do
-	 if {IsNote N} then Tlist := {List.append @Tlist {NoteToExtended N} $}
-	 elseif {IsExtNote N} then Tlist := {List.append @Tlist N $}
-	 elseif {IsChord N} then Tlist := {List.append @Tlist {ChordToExtended N} $ }
-	 elseif {IsExtChord N } then Tlist := {List.append @Tlist N }
-	 elseif {IsTrans N }then Tlist := {List.append @Tlist {Transform N} $ }
-	 else
-	    skip %%%Si le type de N n'est pas reconnu
-	 end %end du if
-      end %end du for
-      @Tlist
-   end%end du local
-   
+   local ExtendedPart in
+      fun {ExtendedPart Part}
+	 case Part of nil then nil
+	 [] H|T then
+	    if {IsNote H} then {NoteToExtended H}|{ExtendedPart T}
+	    elseif {IsExtNote H} then H|{ExtendedPart T}
+	    elseif {IsChord H} then {ChordToExtended H}|{ExtendedPart T}
+	    elseif {IsExtChord H} then  H|{ExtendedPart T}
+	    elseif {IsTrans H} then {List.append {Transform H} {ExtendedPart T} $} %on utilise append car en fin de Transform il y a un nil qu'on ne veut pas
+	    else
+	       {ExtendedPart T}
+	    end
+	 end
+      end
+      {ExtendedPart Partition}
+   end
 end
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
