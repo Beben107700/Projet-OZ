@@ -87,17 +87,12 @@ fun{Stretch Fact Part}
       fun {StretchExt Fact EPart}
 	 case EPart of nil then nil
 	 [] H|T then if {IsExtNote H} then
-			{H.duration} := {Fact*H.duration}
-		     elseif {IsExtChord H} then
-			for S in H
-			   {S.duration} := {Fact*S.duration}
-			end
+			notenote(name:H.name duration:Fact*H.duration octave:H.octave sharp:H.sharp instrument:H.instrument)|{StretchExt Fact T}	
+		     elseif {IsExtChord H} then % H est une liste de note donc on peut lui appliquer stretch
+			{Stretch Fact H}|{Stretch Fact T}
 		     else
-			skip % erreur ni note ni chord => transormation
+			{Stretch Fact T} % ni note ni chord => transormation, on passe à l'element suivant
 		     end
-	    H|{StretchExt Fact T}
-	 else
-	    skip
 	 end
       end
       {StretchExt Fact ExtPart}
@@ -118,21 +113,25 @@ fun {Duration Sec Part}
 end
 
 fun {GetDuration Part}
-   local C ExtPart in
-      C = {NewCell 0}
+   local GetDur ExtPart in
       ExtPart = {PartitionToTimedList Part}
-      for S in ExtPart do
-	 if {IsExtChord S} then
-	    C:= @C + S.1.duration
-	 elseif {IsExtNote S} then
-	    C:= @C + S.duration	
-	 else
-	    skip
+      fun {GetDur EPart}
+	 case EPart of nil then nil
+	 [] H|T then
+	    if {IsExtNote H} then
+	       H.duration + {GetDur T}
+	    elseif {IsExtChord H} then
+	       {GetDur H}+{GetDur T}
+	    else % ni note ni chord => transformation,on passe à l'élément suivant
+	       {GetDur T}
+	    end
 	 end
+	 
       end
-      @C
+      {GetDur ExtPart}
    end
 end
+
 fun {Drone Note Amount}
    local C ExtPart in
       C = {NewCell nil}

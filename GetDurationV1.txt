@@ -1,0 +1,16 @@
+fun {GetDuration Part}
+   local C ExtPart in
+      C = {NewCell 0}
+      ExtPart = {PartitionToTimedList Part}
+      for S in ExtPart do
+	 if {IsExtChord S} then
+	    C:= @C + S.1.duration
+	 elseif {IsExtNote S} then
+	    C:= @C + S.duration	
+	 else
+	    skip
+	 end
+      end
+      @C
+   end
+end
