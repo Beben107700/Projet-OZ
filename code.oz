@@ -1,4 +1,4 @@
-declare IsTrans Transform IsNote IsExtNote IsChord IsExtChord Stretch NoteToExtended ChordToExtended PartitionToTimedList Mix Drone
+declare IsTrans Transform IsNote IsExtNote IsChord IsExtChord Stretch NoteToExtended ChordToExtended PartitionToTimedList Mix Drone GetDuration
    % See project statement for API details.
  %  [Project] = {Link ['Project2018.ozf']}
   % Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
@@ -31,7 +31,6 @@ fun{Transform X}
    end
 end
 
-{Browse {Drone a 5}}
 fun{IsNote X}
    if{Tuple.is X}then true
    elseif {Atom.is X}then true
@@ -91,7 +90,7 @@ fun{Stretch Fact Part}
 	 [] H|T then if {IsExtNote H} then
 			note(name:H.name duration:Fact*H.duration octave:H.octave sharp:H.sharp instrument:H.instrument)|{StretchExt Fact T}	
 		     elseif {IsExtChord H} then % H est une liste de note donc on peut lui appliquer stretch
-			{Stretch Fact H}|{Stretch Fact T}
+			{List.append {Stretch Fact H} {Stretch Fact T} $ }
 		     else
 			{Stretch Fact T} % ni note ni chord => transormation, on passe à l'element suivant
 		     end%fin du if
@@ -103,47 +102,46 @@ fun{Stretch Fact Part}
    end%fin du local
 end   
 
+fun {GetDuration List}
+   local Accumulateur in
+      
+      
+      fun{Accumulateur Acc Reste}
+	 case Reste
+	 of nil then Acc
+	 [] H|T then {Accumulateur H.duration+Acc T}
+	 end
+	 
+	 
+	 
 
-		      
-		      
-		      
-     
+      end %local
+      {Accumulateur 0.0 {PartitionToTimedList List}}
+   end
+end
+
 
 fun {Duration Sec Part}
    local Fact in
-      Fact = Sec/{GetDuration Part}
+      Fact = Sec / {GetDuration Part} %doit rendre un float!
       {Stretch Fact Part}
    end
 end
-
-fun {GetDuration Part}
-   local GetDur in
-      fun {GetDur EPart}
-	 case EPart of nil then nil
-	 [] H|T then
-	    if {IsExtNote H} then
-	       H.duration + {GetDur T}
-	    elseif {IsExtChord H} then
-	       {GetDur H}+{GetDur T}
-	    else % ni note ni chord => transformation,on passe à l'élément suivant
-	       {GetDur T}
-	    end
-	 end
-      end
-      {GetDur {PartitionToTimedList Part}}
-   end
-end
 fun{Drone Note Amount}
-	local Recurs  ExtN in
-		if {IsNote Note} then ExtN = {NoteToExtended Note}
-		else ExtN = Note end	
-		fun {Recurs N}
-			if N < Amount then
-				Note|{Recurs N+1}
-			else %n == amount
-				Note|nil
-			end
+   local Recurs  ExtN in
+      if {IsNote Note} then ExtN = {NoteToExtended Note}
+      else ExtN =  Note end
+
+      
+      fun {Recurs N}
+	 if N < Amount then
+	    ExtN|{Recurs N+1}
+	 else %n == amount
+	    ExtN|nil
+	 end
 		end %fct
+
+		
 		{Recurs 1}
 	end%local
 end
@@ -218,7 +216,6 @@ fun {PartitionToTimedList Partition}
    end
 end
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 fun {Mix P2T Music}
@@ -226,8 +223,7 @@ fun {Mix P2T Music}
    %{Project.readFile 'wave/animaux/cow.wav'}
    true
 end
-
-
+{Browse {Duration 4.0 [a a]}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
      % Music = {Project.load 'joy.dj.oz'}
