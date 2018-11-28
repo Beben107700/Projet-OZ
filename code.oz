@@ -26,7 +26,7 @@ fun{Transform X}
    of duration(seconds:S B) then {Duration S B}%appel a la fct duration
    [] stretch(factor:S B) then {Stretch S B}%appel a la fct stretch
    [] drone(note:S amount:B)then {Drone S B}%appel a drone
-   [] transpose(semitones:S B)then true%appel a transpose
+   [] transpose(semitones:S B)then {Transpose S B}%appel a transpose
    else false
    end
 end
@@ -269,10 +269,6 @@ fun {Mix P2T Music}
    %{Project.readFile 'wave/animaux/cow.wav'}
    true
 end
-%{Browse {Duration 4.0 [a a]}}
-%{Browse {Transpose 1 [c1 d1 e1]}
-
-{Browse {PartitionToTimedList [a e stretch(factor:2.0 [c c])]}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -24,7 +24,7 @@ end
 fun{Transform X}
    case X
    of duration(seconds:S B) then {Duration S B}%appel a la fct duration
-   [] stretch(factor:S B) then {Stretch B S}%appel a la fct stretch
+   [] stretch(factor:S B) then {Stretch S B}%appel a la fct stretch
    [] drone(note:S amount:B)then {Drone S B}%appel a drone
    [] transpose(semitones:S B)then true%appel a transpose
    else false
@@ -50,11 +50,9 @@ fun{IsExtNote X}
 end
 
 fun{IsChord X} %ATTENTION SI IL RECOIT UNE PARTITION IL ENVOIE TRUE
-   case X %C'est ok selon l'énoncé
+   case X
    of H|T then
       if {IsNote H} then
-	 true
-      elseif {IsExtNote H} then
 	 true
       else
 	 false
@@ -82,7 +80,6 @@ end
 
 fun{Stretch Fact Part}   
    local StretchExt in
-      
       fun {StretchExt Fact EPart}
 	 case EPart of nil then nil
 	 [] H|T then if {IsExtNote H} then
@@ -92,8 +89,6 @@ fun{Stretch Fact Part}
 		     end
 	 end%fin case
       end%fin fct
-
-      
       {StretchExt Fact {PartitionToTimedList Part}}
    end%fin du local
 end   
@@ -227,21 +222,17 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 fun {ChordToExtended Chord}
-      %Chord est une MOTHERFUKING LISTE H|T
-      %On doit renvoyer une MOTHERFUCKING LISTE qui comprend des EXTENDED NOTE
    case Chord
    of nil then nil
    [] H|T then
-      {NoteToExtended H}|{ChordToExtended T}
-   else
-      nil
+      if {IsExtNote H} then
+	 H|{ChordToExtended T}
+      else
+	 {NoteToExtended H}|{ChordToExtended T}
+      end
+      
    end
-   
-   
 end
-
-
-
 
 
 
@@ -249,24 +240,28 @@ fun {PartitionToTimedList Partition}
       %NB: Partition est une liste [a1 a2 a3 a4]
       %ai représente soit une note|chord|extendednote|extendedchord|transformation
    local ExtendedPart in
-      fun {ExtendedPart Part}
-	 case Part of nil then nil%fin de liste
-	 [] H|T then
-	    if {IsNote H} then {NoteToExtended H}|{ExtendedPart T}
-	    elseif {IsExtNote H} then H|{ExtendedPart T}
-	    elseif {IsChord H} then {ChordToExtended H}|{ExtendedPart T}
-	    elseif {IsExtChord H} then  H|{ExtendedPart T}
-	    elseif {IsTrans H} then {List.append {Transform H} {ExtendedPart T} $} %on utilise append car en fin de Transform il y a un nil qu'on ne veut pas
+
+      fun{ExtendedPart Part}
+	 case Part
+	 of nil then nil
+	 []H|T then
+	    if {IsChord H} then
+	       {ChordToExtended H}|{ExtendedPart T}
+	    elseif {IsExtNote H} then
+	       H|{ExtendedPart T}
+	    elseif {IsNote H} then
+	       {NoteToExtended H}|{ExtendedPart T}
+	    elseif {IsExtChord H} then
+	       H|{ExtendedPart T}
 	    else
-	       {ExtendedPart T}%tourne en boucle ici
-	    end%fin du if
-	 else
-	    nil %WALLAY si c'est rien
-	 end
+	       {Append {Transform H} {ExtendedPart T}}
+	    end    
+	 end	
       end
       {ExtendedPart Partition}
    end
 end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 fun {Mix P2T Music}
@@ -275,8 +270,9 @@ fun {Mix P2T Music}
    true
 end
 %{Browse {Duration 4.0 [a a]}}
-%{Browse {Transpose 1 [c1 d1 e1]}}
+%{Browse {Transpose 1 [c1 d1 e1]}
 
+{Browse {PartitionToTimedList [a e stretch(factor:2.0 [c c])]}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
