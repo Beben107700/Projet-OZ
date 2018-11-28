@@ -1,11 +1,14 @@
-local
+declare IsTrans Transform IsNote IsExtNote IsChord IsExtChord Stretch NoteToExtended ChordToExtended PartitionToTimedList Mix Drone GetDuration GetNote GetNumber Transpose
    % See project statement for API details.
-   [Project] = {Link ['Project2018.ozf']}
-   Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
+ %  [Project] = {Link ['Project2018.ozf']}
+  % Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
 
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%bien le bonsoir
+%%%%
 
-  fun{IsTrans X}
+%%J'ai 3 litres de lait
+
+fun{IsTrans X}
    if{Record.is X}then
       case X
       of duration(seconds:S B) then true %%ATTANTION On ne verifie pas si B est une partition
@@ -59,7 +62,7 @@ fun{IsChord X} %ATTENTION SI IL RECOIT UNE PARTITION IL ENVOIE TRUE
 end
 
 fun{IsExtChord X} 
-   case X %C'est ok selon l'Ã©noncÃ©
+   case X %C'est ok selon l'énoncé
    of H|T then
       if {IsExtNote H} then
 	 true
@@ -183,8 +186,8 @@ fun {GetNote I}
 	 
       end
       
-      N = I mod 12 %numÃ©ro de la note entre 0 et 11
-      %DiÃ¨se = N mod 2 % 1 si #
+      N = I mod 12 %numéro de la note entre 0 et 11
+      %Dièse = N mod 2 % 1 si #
       Tab = migEtben(0:b 1:c 2:c 3:d 4:d 5:e 6:f 7:f 8:g 9:g 10:a 11:a)
       Oct = (I div 12)+1
 
@@ -235,7 +238,7 @@ end
 
 fun {PartitionToTimedList Partition}
       %NB: Partition est une liste [a1 a2 a3 a4]
-      %ai reprÃ©sente soit une note|chord|extendednote|extendedchord|transformation
+      %ai représente soit une note|chord|extendednote|extendedchord|transformation
    local ExtendedPart in
 
       fun{ExtendedPart Part}
@@ -267,28 +270,35 @@ fun {Mix P2T Music}
    true
 end
 
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'joy.dj.oz'}
-   Start
+     % Music = {Project.load 'joy.dj.oz'}
+    %  Start
 
    % Uncomment next line to insert your tests.
    % \insert 'tests.oz'
    % !!! Remove this before submitting.
-in
-   Start = {Time}
+
+   %BEN DELCOIGNE A COMMENTE LA LIGNE SUIVANTE
+      %Start = {Time}
 
    % Uncomment next line to run your tests.
    % {Test Mix PartitionToTimedList}
 
    % Add variables to this list to avoid "local variable used only once"
    % warnings.
-   {ForAll [NoteToExtended Music] Wait}
-   
+
+      %BEN DELCOIGNE A COMMENTE LA LIGNE SUIVANTE
+     % {ForAll [NoteToExtended Music] Wait}
+
    % Calls your code, prints the result and outputs the result to `out.wav`.
    % You don't need to modify this.
-   {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
-   
+
+      %BEN DELCOIGNE A COMMENTE LA LIGNE SUIVANTE
+      %{Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
+
    % Shows the total time to run your code.
-   {Browse {IntToFloat {Time}-Start} / 1000.0}
-end
+   %{Browse {IntToFloat {Time}-Start} / 1000.0}
+
+
+

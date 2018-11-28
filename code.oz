@@ -245,14 +245,15 @@ fun {PartitionToTimedList Partition}
 	 case Part
 	 of nil then nil
 	 []H|T then
-	    if {IsChord H} then
+	    if {IsExtChord H} then
+	       H|{ExtendedPart T}
+	    elseif {IsChord H} then
 	       {ChordToExtended H}|{ExtendedPart T}
 	    elseif {IsExtNote H} then
 	       H|{ExtendedPart T}
 	    elseif {IsNote H} then
 	       {NoteToExtended H}|{ExtendedPart T}
-	    elseif {IsExtChord H} then
-	       H|{ExtendedPart T}
+
 	    else
 	       {Append {Transform H} {ExtendedPart T}}
 	    end    
