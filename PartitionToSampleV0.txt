@@ -1,0 +1,52 @@
+fun {PartitionToSample Partition}
+end
+
+declare
+Pi = 3,141 592 653 589 793
+end
+fun {ExtNoteToSample ExtNote}
+   local I F A Pi Samp Recursive in
+     
+      I = {GetNumber ExtNote}
+      H = I - {GetNumber {NoteToExtended a4}} % on fixe le La comme 0 (référence)
+      F = {Pow 2 h/12}
+      Samp = 44100*ExtNote.duration
+      fun {Recursive N}
+	 if N =< Samp-1
+	    0.5*{Sin 2*Pi*F*N/44100}|{Recursive N+1}
+	 else
+	    nil
+	 end
+      end
+      A = {Recursive 0}
+      A
+   end
+end
+
+fun {ExtChordToSample ExtChord}
+   local Ferquences Recursive Samp in
+      fun {Frequences EChord}
+	 case EChord of nil then nil
+	 [] S|T then
+	    {Pow 2 ({GetNumber S}-{GetNumber {NoteToExtended a4}})/12}|{Frequances T}
+	 end
+      end
+
+      F = {Frequences ExtChord}
+      
+      fun {Recursive N}
+	 if N =< Samp-1 then 
+	    fun {SumSinus Freq}
+	       case Freq of nil then 0
+	       [] S|T then
+		  {Sin 2*Pi*F*N/44100}+{SumSinus T}
+	       end
+	    end
+	    ({SumSinus F}/{List.length F})|{Recursive N+1}
+
+	 else
+	    nil
+	 end
+      end
+      {Recursive 0}
+   end
