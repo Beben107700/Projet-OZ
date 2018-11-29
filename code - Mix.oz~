@@ -63,7 +63,7 @@ fun{IsChord X} %ATTENTION SI IL RECOIT UNE PARTITION IL ENVOIE TRUE
 end
 
 fun{IsExtChord X} 
-   case X %C'est ok selon l'énoncé
+   case X %C'est ok selon l'Ã©noncÃ©
    of H|T then
       if {IsExtNote H} then
 	 true
@@ -198,8 +198,8 @@ fun {GetNote I}
 	 
       end
       
-      N = I mod 12 %numéro de la note entre 0 et 11
-      %Dièse = N mod 2 % 1 si #
+      N = I mod 12 %numÃ©ro de la note entre 0 et 11
+      %DiÃ¨se = N mod 2 % 1 si #
       Tab = migEtben(0:b 1:c 2:c 3:d 4:d 5:e 6:f 7:f 8:g 9:g 10:a 11:a)
       Oct = (I div 12)+1
 
@@ -250,7 +250,7 @@ end
 
 fun {PartitionToTimedList Partition}
       %NB: Partition est une liste [a1 a2 a3 a4]
-      %ai représente soit une note|chord|extendednote|extendedchord|transformation
+      %ai reprÃ©sente soit une note|chord|extendednote|extendedchord|transformation
    local ExtendedPart in
 
       fun{ExtendedPart Part}
@@ -277,6 +277,8 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 fun {Mix P2T Music}
       % TODO
    %{Project.readFile 'wave/animaux/cow.wav'}
@@ -292,13 +294,13 @@ fun {IsSemple Part}
 	 false
       end
    else
-      false % ATTEntion il faut gérer quand liste est vide
+      false % ATTEntion il faut gÃ©rer quand liste est vide
    end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-fun {IsExtPartition ExtPart}
+fun {IsPartition Part}
    if {List.is Part} then
-      if ({IsExtChord Part.1} or {IsExtChord Part.1)} then
+      if {Bool.or {IsExtChord Part.1}  {IsExtNote Part.1}  {IsNote Part.1} {IsChord Part.1} {IsTransform Part.1}} then
 	 true
       else
 	 false
@@ -315,7 +317,7 @@ end
 
 fun {IsMerge Part}
    if {List.is Part} then
-      if {Tuple.is Part.1} then
+      if {Tuple.is Part.1} then % ATTENTION un chord est une liste donc un tuple => un chord peut Ãªtre reconnu comme un tuple
 	 true
       else
 	 false
@@ -324,7 +326,7 @@ fun {IsMerge Part}
 end
 
 fun {IsFilter Part}
- % pas nécessaire je pense
+ % pas nÃ©cessaire je pense
 end
 
 
@@ -332,21 +334,83 @@ end
 
 %---------------------- ZONE DES SEMPLED-------------------
 fun {SempledPartition Part}
+   local SampledNote SampledChord ExtPart in
+      ExtPart = {P2T Part}
+      fun {SampledNote ExtNote}
+	 local  F A  Samp Recursive in
+	    H = {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}} % on fixe le La comme 0 (rÃ©fÃ©rence)
+	    F = {Pow 2 h/12}
+	    Samp = 44100*ExtNote.duration
+	    fun {Recursive N}
+	       if N =< Samp-1
+		  0.5*{Sin 2*Pi*F*N/44100}|{Recursive N+1}
+	       else
+		  nil
+	       end
+	    end
+	    A = {Recursive 0}
+	    A
+	 end
+      end
+      fun {ExtChordToSample ExtChord}
+	 local Ferquences Recursive Samp in
+	    Samp = 44100*ExtChord.duration
+	    fun {Frequences EChord}      % renvoie une liste avec les frequence de chaque note de l'accord
+	       case EChord of nil then nil
+	       [] S|T then
+		  {Pow 2 ({GetNumber S}-{GetNumber {NoteToExtended a4}})/12}|{Frequances T}
+	       end
+	    end
 
+	    F = {Frequences ExtChord}
+	    
+	    fun {Recursive N}       % crÃ©er la tableau d'echantillions
+	       if N =< Samp-1 then 
+		  fun {SumSinus Freq}
+		     case Freq of nil then 0
+		     [] S|T then
+			{Sin 2*Pi*F*N/44100}+{SumSinus T}
+		     end
+		  end
+		  ({SumSinus F}/{List.length F})|{Recursive N+1}
+
+	       else
+		  nil
+	       end
+	    end
+	    {Recursive 0}
+	 end
+
+      end
+      fun {Parcours EPart}
+	 case EPart of nil then nil
+	 []H|T then
+	    if {IsExtNote H} then {SampledNote H}|{Parcours T}
+	    else {IsExtChord H} then {SampledChord H}|{Parcours T}
+	    end
+	 end
+      end
+      {Parcours ExtPart}   
+   end
 end
 
-fun {SempledWave Part}
 
+fun {SempledWave Part}
+   {â€‹Project.load Part} %ATTENTION gÃ©rÃ©er erreur fichier illisible, inaccesible
 end
 
-fun {SempledWave Part}
-
+fun {SempledMerge Part}
+   local Parcours in
+      fun {Parcours Part}
+	 case Part of nil then nil
+	    []H|T then {SampledPartition
+     
 end
 
 
 %----------------------END ZONE DES SEMPLED-------------------
 
-fun {PartitionToSample Part}
+fun {PartToSample Part}
    local SempledPart in
 
       fun{SempeledPart Part}
@@ -377,52 +441,7 @@ end
 declare
 Pi = 3,141 592 653 589 793
 end
-fun {ExtNoteToSample ExtNote}
-   local I F A Pi Samp Recursive in
-     
-      I = {GetNumber ExtNote}
-      H = I - {GetNumber {NoteToExtended a4}} % on fixe le La comme 0 (référence)
-      F = {Pow 2 h/12}
-      Samp = 44100*ExtNote.duration
-      fun {Recursive N}
-	 if N =< Samp-1
-	    0.5*{Sin 2*Pi*F*N/44100}|{Recursive N+1}
-	 else
-	    nil
-	 end
-      end
-      A = {Recursive 0}
-      A
-   end
-end
 
-fun {ExtChordToSample ExtChord}
-   local Ferquences Recursive Samp in
-      fun {Frequences EChord}
-	 case EChord of nil then nil
-	 [] S|T then
-	    {Pow 2 ({GetNumber S}-{GetNumber {NoteToExtended a4}})/12}|{Frequances T}
-	 end
-      end
-
-      F = {Frequences ExtChord}
-      
-      fun {Recursive N}
-	 if N =< Samp-1 then 
-	    fun {SumSinus Freq}
-	       case Freq of nil then 0
-	       [] S|T then
-		  {Sin 2*Pi*F*N/44100}+{SumSinus T}
-	       end
-	    end
-	    ({SumSinus F}/{List.length F})|{Recursive N+1}
-
-	 else
-	    nil
-	 end
-      end
-      {Recursive 0}
-   end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 {Browse {Drone a 4}}
      % Music = {Project.load 'joy.dj.oz'}

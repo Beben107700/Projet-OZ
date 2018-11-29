@@ -32,4 +32,23 @@ end
 %INPUT loop(seconds:duration music)
 
 
+%pas facile facile
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%Clip 
+declare Clip
+fun{Clip Low High Music}
+   local Recurs in
+      fun{Recurs Liste}
+	 case Liste
+	 of H|T
+	 then
+	    
+	 end
+	 
+      end
+      
+   end
+   
+end
