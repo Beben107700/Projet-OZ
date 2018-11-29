@@ -1,0 +1,16 @@
+fun {SampledNote ExtNote}
+	 local  F A  Samp Recursive in
+	    H = {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}} % on fixe le La comme 0 (référence)
+	    F = {Pow 2 h/12}
+	    Samp = 44100*ExtNote.duration
+	    fun {Recursive N}
+	       if N =< Samp-1 then
+		  0.5*{Sin 2*Pi*F*N/44100}|{Recursive N+1}
+	       else
+		  nil
+	       end
+	    end
+	    A = {Recursive 0}
+	    12 %%%%%%%%%%%%%%%%
+	 end
+      end

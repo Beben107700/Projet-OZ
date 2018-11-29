@@ -226,8 +226,7 @@ fun{NoteToExtended Note}
 	      duration:1.0
 	      instrument: none)
       end
-   else
-      Note
+   else     Note
       
    end
 end
@@ -302,7 +301,7 @@ end
 declare IsPartition
 fun {IsPartition Part}
    if {List.is Part} then
-      if {IsExtChord Part.1} orelse {IsExtNote Part.1}orelse  {IsNote Part.1}orelse {IsChord Part.1} orelse{IsTransform Part.1} then
+      if {IsExtChord Part.1} orelse {IsExtNote Part.1}orelse  {IsNote Part.1}orelse {IsChord Part.1} orelse{IsTrans Part.1} then
 	 true
       else
 	 false
@@ -343,21 +342,20 @@ end
 
 %---------------------- ZONE DES SAMPLED-------------------
 
-declare
-Pi = 3,141 592 653 589 793
-end
+declare Pi
+Pi = 3.1415
 declare SampledPartition
 fun {SampledPartition Part}
    local SampledNote SampledChord ExtPart Parcours in
-      ExtPart = {P2T Part} %%%%%%%%%%%%%%%%%%%IL FAUT ABSOLUMENT METTRE P2T APRES
+      ExtPart = {PartitionToTimedList Part} %%%%%%%%%%%%%%%%%%%IL FAUT ABSOLUMENT METTRE P2T APRES
       fun {SampledNote ExtNote}
-	 local  F A  Samp Recursive in
-	    H = {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}} % on fixe le La comme 0 (référence)
-	    F = {Pow 2 h/12}
-	    Samp = 44100*ExtNote.duration
+	 local  F A H Samp Recursive in
+	    H = {Int.toFloat {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}}} % on fixe le La comme 0 (reference)
+	    F = {Pow 2.0 H/12.0}
+	    Samp = {Float.toInt 44100.0*ExtNote.duration}
 	    fun {Recursive N}
 	       if N =< Samp-1 then
-		  0.5*{Sin 2*Pi*F*N/44100}|{Recursive N+1}
+		  0.5*{Sin 2.0*Pi*F*{Int.toFloat N}/44100.0}|{Recursive N+1}
 	       else
 		  nil
 	       end
@@ -366,28 +364,28 @@ fun {SampledPartition Part}
 	    A
 	 end
       end
-      fun {SampledChord ExtChord}
-	 local Frequences Recursive Samp SumSinus in
-	    Samp = 44100*ExtChord.duration
+     fun {SampledChord ExtChord}
+	 local Frequences Recursive Samp SumSinus F in
+	    Samp = {Float.toInt 44100.0*ExtChord.duration}%ExtChord.duration}
 	    fun {Frequences EChord}      % renvoie une liste avec les frequence de chaque note de l'accord
 	       case EChord of nil then nil
 	       [] S|T then
-		  {Pow 2 ({GetNumber S}-{GetNumber {NoteToExtended a4}})/12}|{Frequences T}
+		  {Pow 2.0 {Int.toFloat {GetNumber S}-{GetNumber {NoteToExtended a4}}}/12.0}|{Frequences T} %{Int.toFloat {GetNumber S}-{GetNumber {NoteToExtended a4}}}/12.0}|{Frequences T}
 	       end
 	    end
 
 	    F = {Frequences ExtChord}
 	    fun {SumSinus Freq M} % un Ai d'un accord
-	       case Freq of nil then 0
+	       case Freq of nil then 0.0
 	       [] S|T then
-		  {Sin 2*Pi*F*M/44100}+{SumSinus T M}
+		  0.5*{Sin 2.0*Pi*S*{Int.toFloat M}}/44100.0+{SumSinus T M}
 	       end
 	    end
-	    fun {Recursive N}% créer la tableau d'echantillions	 
+	    fun {Recursive N}% creer la tableau d'echantillions	 
 	       if N < Samp-1 then 
-		  ({SumSinus F N}/{List.length F})|{Recursive N+1}
+		  {SumSinus F N}/{Int.toFloat {List.length F}}|{Recursive N+1}
 	       else
-		  {SumSinus F N+1}/{List.length F}
+		  {SumSinus F N+1}/{Int.toFloat {List.length F}}
 	       end
 	    end
 	    {Recursive 0}
@@ -397,9 +395,10 @@ fun {SampledPartition Part}
 	 case EPart of nil then nil
 	 []H|T then
 	    if {IsExtNote H} then {SampledNote H}|{Parcours T}
-	    elseif {IsExtChord H} then {SampledChord H}|{Parcours T}
-	    else 12 %FAUT FAIRE UNE EXCEPTION
+	    else
+	       {SampledChord H}|{Parcours T}
 	    end
+	    
 	 end
       end
       {Parcours ExtPart}   
@@ -407,26 +406,26 @@ fun {SampledPartition Part}
 end
 
 
+declare SampledWave
 fun {SampledWave Part}
-   {​Project.load Part} %ATTENTION géréer erreur fichier illisible, inaccesible
+  [1.0]% {​Project.load Part} %ATTENTION géréer erreur fichier illisible, inaccesible
 end
-
+declare SampledMerge
 fun {SampledMerge Part}
-   13
  %  local Parcours in
-  %  fun {Parcours Part}
+  %  fun {Parcours }
 %	 case Part of nil then nil %JE DOIS PRENDRE MON TRAIN JE ME BARRE
 %	 []H|T then {SampledPartition
-   
+   [1.0]
 end
 
 
 %----------------------END ZONE DES saMPLED-------------------
-
+declare PartToSample
 fun {PartToSample Part}
    local SampledPart in
 
-      fun{SampeledPart Part}
+      fun{SampledPart Part}
 	 case Part
 	 of nil then nil
 	 []H|T then
@@ -440,11 +439,11 @@ fun {PartToSample Part}
 	       {SampledMerge H}|{SampledPart T}
 
 	    else
-	       % Filter ? {Append {Filter H} {SampledPart T}}
+	       12.0% Filter ? {Append {Filter H} {SampledPart T}}
 	    end    
 	 end	
       end
-      {ExtendedPart Partition}
+      {SampledPart Part}
    end 
    
 end
