@@ -9,6 +9,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%TODO _ A FAIRE _ TE DOEN%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%CUT
 
 
 %%%%%%%%%%%%%REPEAT
@@ -127,8 +128,8 @@ end
 declare Fade
 fun{Fade Start Out Music}
    local StartEch OutEch Increment A1 A2 A3 in
-      StartEch = {Float.toInt Start*1.0}
-      OutEch = {Float.toInt Out*1.0}
+      StartEch = {Float.toInt Start*44100.0}
+      OutEch = {Float.toInt Out*44100.0}
       %INT StartEch et OutEch
       %FLOAT H
       %INT Borne
@@ -155,14 +156,14 @@ fun{Fade Start Out Music}
 
    end%local
 end
-{Browse {Fade 4.0 4.0 [1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]}}
+%{Browse {Fade 4.0 4.0 [1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]}}
 %{Browse {Fade 4.0 4.0 [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]}} %TEST QUI N'IRA PAS PSQ ON A DES INT
 
 declare Cut
 fun{Cut Start Finish Music}
    local Nstart Nstop Recursion in
-      Nstart = {Float.toInt Start*1.0}
-      Nstop = {Float.toInt Finish*1.0}
+      Nstart = {Float.toInt Start*44100.0}
+      Nstop = {Float.toInt Finish*44100.0}
       fun{Recursion N Liste}
 	 if N =< Nstop then
 	    case Liste
@@ -184,5 +185,5 @@ fun{Cut Start Finish Music}
    end
    
 end
-{Browse {Cut 4.0 9.0 [1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 ]}}
-{Browse 1}
+%{Browse {Cut 4.0 9.0 [1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 ]}}
+%{Browse 1}
