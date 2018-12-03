@@ -462,9 +462,9 @@ end
 %OUTPUT: tous ces elements seront graduellement mis entre -1 et 1
 declare Normaliser
 fun{Normaliser Liste}
-   local FindHigh Smallest Largest Divide in
-      Smallest = {NewCell 20000.0}
-      Largest = {NewCell ~20000.0}
+   local FindHigh Smallest Largest Divide FACTOR in
+      Smallest = {NewCell 2000.0}
+      Largest = {NewCell ~2000.0}
 
       fun{FindHigh L} %Cette fonction renvoie le plus grand nombre trouve dans la liste
 	 case L
@@ -491,14 +491,17 @@ fun{Normaliser Liste}
 	 end
 	 
       end
+      thread FACTOR = {FindHigh Liste} end
+      if FACTOR > 1.0 then
+	 {Divide Liste FACTOR} %Fait Divide avec la Liste; {FindHigh Liste} permet de trouver par quel facteur il faut diviser
+      else
+	 Liste
+      end
       
-      {Divide Liste {FindHigh Liste}} %Fait Divide avec la Liste; {FindHigh Liste} permet de trouver par quel facteur il faut diviser
       
    end
    
 end
-%{Browse {Normaliser [10.0 9.0 ~1.0 ~21.0]}}
-
 
 declare Merge
 fun{Merge Liste}
@@ -511,7 +514,7 @@ fun{Merge Liste}
 	    
 	    case H
 	    of A#B then
-	       First := {SumList @First 1.0 B A}
+	       First := {SumList @First 1.0 {Mix P2T B} A} %What is P2T? On ne sait pas, doit etre sous fonction de Mix pour y acceder
 	       {Run T}
 	    end
 	    

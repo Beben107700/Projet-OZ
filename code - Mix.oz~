@@ -21,15 +21,7 @@ fun{IsTrans X}
    end
 end
 
-fun{Transform X}
-   case X
-   of duration(seconds:S B) then {Duration S B}%appel a la fct duration
-   [] stretch(factor:S B) then {Stretch S B}%appel a la fct stretch
-   [] drone(note:S amount:B)then {Drone S B}%appel a drone
-   [] transpose(semitones:S B)then {Transpose S B}%appel a transpose
-   else false
-   end
-end
+
 
 fun{IsNote X}
    if{Tuple.is X}then true
@@ -78,6 +70,16 @@ end
 
 
 %---------------------ZONE DES TRANSFORMATIONS ----------------------
+
+fun{Transform X}
+   case X
+   of duration(seconds:S B) then {Duration S B}%appel a la fct duration
+   [] stretch(factor:S B) then {Stretch S B}%appel a la fct stretch
+   [] drone(note:S amount:B)then {Drone S B}%appel a drone
+   [] transpose(semitones:S B)then {Transpose S B}%appel a transpose
+   else false
+   end
+end
 
 fun{Stretch Fact Part}   
    local StretchExt in
@@ -509,7 +511,7 @@ fun{Merge Liste}
 	    
 	    case H
 	    of A#B then
-	       First := {SumList @First 1.0 B A}
+	       First := {SumList @First 1.0 {Mix P2T B} A} %What is P2T? On ne sait pas, doit etre sous fonction de Mix pour y acceder
 	       {Run T}
 	    end
 	    
@@ -735,9 +737,9 @@ fun {Mix P2T Music}
 	    elseif {IsPartition H} then
 	       {List.append {SampledPartition H} {SampledPart T}}
 	    elseif {IsWave H} then
-	        {List.append {SampledWave H} {SampledPart T}}
+	       {List.append {SampledWave H} {SampledPart T}}
 	    elseif {IsMerge H} then
-	        {List.append {Merge H} {SampledPart T}}
+	       {List.append {Merge H} {SampledPart T}}
 	    else
 	       {List.Append {SampledFilter H} {SampledPart T}}
 	    end    
