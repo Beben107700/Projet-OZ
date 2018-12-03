@@ -1,7 +1,7 @@
 declare IsTrans Transform IsNote IsExtNote IsChord IsExtChord Stretch NoteToExtended ChordToExtended PartitionToTimedList Mix Drone GetDuration GetNote GetNumber Transpose
    % See project statement for API details.
-   [Project] = {Link ['Project2018.ozf']}
-    Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
+ %  [Project] = {Link ['Project2018.ozf']}
+  % Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%bien le bonsoir
 %%%%
@@ -21,6 +21,16 @@ fun{IsTrans X}
    end
 end
 
+fun{Transform X}
+   case X
+   of duration(seconds:S B) then {Duration S B}%appel a la fct duration
+   [] stretch(factor:S B) then {Stretch S B}%appel a la fct stretch
+   [] drone(note:S amount:B)then {Drone S B}%appel a drone
+   [] transpose(semitones:S B)then {Transpose S B}%appel a transpose
+   else false
+   end
+end
+
 fun{IsNote X}
    if{Tuple.is X}then true
    elseif {Atom.is X}then true
@@ -36,7 +46,8 @@ fun{IsExtNote X}
       end
    else
       false
-   end  
+   end
+   
 end
 
 fun{IsChord X} %ATTENTION SI IL RECOIT UNE PARTITION IL ENVOIE TRUE
@@ -63,17 +74,10 @@ fun{IsExtChord X}
    end
 end
 
-%---------------------ZONE DES TRANSFORMATIONS ----------------------
 
-fun{Transform X}
-   case X
-   of duration(seconds:S B) then {Duration S B}%appel a la fct duration
-   [] stretch(factor:S B) then {Stretch S B}%appel a la fct stretch
-   [] drone(note:S amount:B)then {Drone S B}%appel a drone
-   [] transpose(semitones:S B)then {Transpose S B}%appel a transpose
-   else false
-   end
-end
+
+
+%---------------------ZONE DES TRANSFORMATIONS ----------------------
 
 fun{Stretch Fact Part}   
    local StretchExt in
@@ -85,7 +89,10 @@ fun{Stretch Fact Part}
 			   			note(name:H.name duration:Fact*H.duration octave:H.octave sharp:H.sharp instrument:H.instrument)|{StretchExt Fact T}
 			[]silence(duration:A) then
 			   silence(duration:Fact*A)|{StretchExt Fact T}
-			end	   
+			end
+			
+			   
+	
 		     else % H est une liste de note donc on peut lui appliquer stretch
 			{Stretch Fact H}|{Stretch Fact T}          %{List.append {Stretch Fact H} {Stretch Fact T} $ }
 		     end
@@ -97,6 +104,8 @@ end
 
 fun {GetDuration List}
    local Accumulateur in
+      
+      
       fun{Accumulateur Acc Reste}
 	 case Reste
 	 of nil then Acc
@@ -105,6 +114,7 @@ fun {GetDuration List}
       {Accumulateur 0.0 {PartitionToTimedList List}}
    end
 end
+
 
 fun {Duration Sec Part}
    local Fact in
@@ -116,6 +126,7 @@ fun{Drone Note Amount}
    local Recurs  ExtN in
       if {IsNote Note} then ExtN = {NoteToExtended Note}
       else ExtN =  Note end
+
       
       fun {Recurs N}
 	 if N =< Amount then
@@ -123,7 +134,9 @@ fun{Drone Note Amount}
 	 else %n == amount
 	    nil
 	 end
-      end %fct
+		end %fct
+
+      
       {Recurs 1}
    end%local
 end
@@ -137,13 +150,13 @@ fun{Transpose Semiton Part} %Souci si j'ai un silence dans ma part.
 	    of silence(duration:A) then silence(duration:A)|{Recurs T}
 	    else {GetNote {GetNumber H}+Semiton}|{Recurs T}
 	    end
+	    
 	 []nil then nil
 	 end%Case
       end%fct
       {Recurs {PartitionToTimedList Part}}
    end%local
 end%fct
-
 fun {GetNumber ExtNote}
    case ExtNote.name of 'c' then 
       if ExtNote.sharp then 2+ 12*(ExtNote.octave-1) % do#
@@ -171,7 +184,6 @@ fun {GetNumber ExtNote}
       12 + 12*(ExtNote.octave -1 ) %si
    end
 end
-
 fun {GetNote I}
    local Tab Oct N IsSharp in
       fun{IsSharp U}
@@ -183,11 +195,14 @@ fun {GetNote I}
 	 []11 then true
 	 else false
 	 end
+	 
       end
+      
       N = I mod 12 %numéro de la note entre 0 et 11
       %Dièse = N mod 2 % 1 si #
       Tab = migEtben(0:b 1:c 2:c 3:d 4:d 5:e 6:f 7:f 8:g 9:g 10:a 11:a)
       Oct = (I div 12)+1
+
       note(name:Tab.N duration:1.0 octave:Oct sharp:{IsSharp N} instrument:none)
    end
 end
@@ -230,6 +245,8 @@ fun {ChordToExtended Chord}
    end
 end
 
+
+
 fun {PartitionToTimedList Partition}
       %NB: Partition est une liste [a1 a2 a3 a4]
       %ai représente soit une note|chord|extendednote|extendedchord|transformation
@@ -247,6 +264,7 @@ fun {PartitionToTimedList Partition}
 	       H|{ExtendedPart T}
 	    elseif {IsNote H} then
 	       {NoteToExtended H}|{ExtendedPart T}
+
 	    else
 	       {Append {Transform H} {ExtendedPart T}}
 	    end    
@@ -257,12 +275,16 @@ fun {PartitionToTimedList Partition}
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%----------------------------------MIX------------------------------------
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+fun {Mix P2T Music}
+      % TODO
+   %{Project.readFile 'wave/animaux/cow.wav'}
+   true
+end
 
 %---------------------- ZONE DES IS-------------------
-
 declare IsSamples
 fun {IsSamples Part}
    if {List.is Part} then
@@ -275,7 +297,7 @@ fun {IsSamples Part}
       false % ATTEntion il faut gérer quand liste est vide
    end
 end
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 declare IsPartition
 fun {IsPartition Part}
    if {List.is Part} then
@@ -288,12 +310,11 @@ fun {IsPartition Part}
       false
    end
 end
-			
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%				
 declare IsWave
 fun {IsWave Part}
-   {String.is Part.1}
+   {String.is Part}
 end
-
 declare IsMerge
 fun {IsMerge Part}
    if {List.is Part} then
@@ -309,15 +330,86 @@ fun {IsMerge Part}
    end
 end
 
+
+declare IsFilter
+fun {IsFilter Part}
+   true
+ % pas nécessaire je pense
+end
+
+
 %----------------------END ZONE IS-------------------
 
 %---------------------- ZONE DES SAMPLED-------------------
 
+declare Pi P2T
+P2T = PartitionToTimedList%%%%%%%% ATT A SUPPRIMER %%%%%%%%%%%%%%%%
+Pi = 3.14159265359
+declare SampledPartition
+fun {SampledPartition Part}
+   local SampledNote SampledChord ExtPart Parcours in
+      ExtPart = {PartitionToTimedList Part} %%%%%%%%%%%%%%%%%%% L FAUT ABSOLUMENT METTRE P2T APRES
+      fun {SampledNote ExtNote}
+	 local  F A H Samp Recursive in
+	    H = {Int.toFloat {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}}} % on fixe le La comme 0 (reference)
+	    F = {Pow 2.0 H/12.0}
+	    Samp = {Float.toInt 44100.0*ExtNote.duration}
+	    fun {Recursive N}
+	       if N =< Samp-1 then
+		  0.5*{Sin 2.0*Pi*F*{Int.toFloat N}/44100.0}|{Recursive N+1}
+	       else
+		  nil
+	       end
+	    end
+	    A = {Recursive 0}
+	    A
+	 end
+      end
+     fun {SampledChord ExtChord}
+	 local Frequences Recursive Samp SumSinus F in
+	    Samp = {Float.toInt 44100.0*ExtChord.duration}%ExtChord.duration}
+	    fun {Frequences EChord}      % renvoie une liste avec les frequence de chaque note de l'accord
+	       case EChord of nil then nil
+	       [] S|T then
+		  {Pow 2.0 {Int.toFloat {GetNumber S}-{GetNumber {NoteToExtended a4}}}/12.0}|{Frequences T} %{Int.toFloat {GetNumber S}-{GetNumber {NoteToExtended a4}}}/12.0}|{Frequences T}
+	       end
+	    end
+
+	    F = {Frequences ExtChord}
+	    fun {SumSinus Freq M} % un Ai d'un accord
+	       case Freq of nil then 0.0
+	       [] S|T then
+		  0.5*{Sin 2.0*Pi*S*{Int.toFloat M}}/44100.0+{SumSinus T M}
+	       end
+	    end
+	    fun {Recursive N}% creer la tableau d'echantillions	 
+	       if N < Samp-1 then 
+		  {SumSinus F N}/{Int.toFloat {List.length F}}|{Recursive N+1}
+	       else
+		  {SumSinus F N+1}/{Int.toFloat {List.length F}}
+	       end
+	    end
+	    {Recursive 0}
+	 end 
+      end
+      fun {Parcours EPart}
+	 case EPart of nil then nil
+	 []H|T then
+	    if {IsExtNote H} then {SampledNote H}|{Parcours T}
+	    else
+	       {SampledChord H}|{Parcours T}
+	    end
+	    
+	 end
+      end
+      {Parcours ExtPart}   
+   end
+end
 
 
 declare SampledWave
-fun {SampledWave Filename}
-  ​[1.0] %{project.readFile Filename} %ATTENTION géréer erreur fichier illisible, inaccesible
+fun {SampledWave Part}
+  [1.0]% {​Project.load Part} %ATTENTION géréer erreur fichier illisible, inaccesible
 end
 
 %%%MERGE
@@ -342,17 +434,25 @@ fun{SumList L1 I1 L2 I2}
 	    []O|P then %On fait l'operation avec uniquement la deuxieme liste
 	       O|{Recurs nil P}
 	    end
+	    
+	    
 	 [] H|T then %Premiere liste non finie
+
+
+	    
 	    case Second
 	    of nil then %On fait l'operation avec uniquement la premiere liste
 	       H|{Recurs T nil}	       
 	    [] X|U then %dans le cas ou les deux ne sont pas finies
 	       (I1*X)+(I2*H)|{Recurs T U}
-	    end  
+	    end
+	    
 	 end
+	 
       end
       {Recurs L1 L2}
-   end 
+   end
+   
 end
 %{Browse {SumList [1.0 1.0 1.0 1.0 1.0 2.0] 2.0 [2.0 2.0 2.0 2.0] 1.0}}
 
@@ -361,9 +461,9 @@ end
 %OUTPUT: tous ces elements seront graduellement mis entre -1 et 1
 declare Normaliser
 fun{Normaliser Liste}
-   local FindHigh Smallest Largest Divide FACTOR in
-      Smallest = {NewCell 2000.0}
-      Largest = {NewCell ~2000.0}
+   local FindHigh Smallest Largest Divide in
+      Smallest = {NewCell 20000.0}
+      Largest = {NewCell ~20000.0}
 
       fun{FindHigh L} %Cette fonction renvoie le plus grand nombre trouve dans la liste
 	 case L
@@ -377,25 +477,48 @@ fun{Normaliser Liste}
 	    else
 	       {FindHigh T}
 	    end
+	    
 	 end
+	 
       end
+
       fun{Divide L Facteur}
 	 case L
 	 of nil then nil
 	 []H|T then
 	    H/Facteur|{Divide T Facteur}
 	 end
+	 
       end
-      thread FACTOR = {FindHigh Liste} end
-      if FACTOR > 1.0 then
-	 {Divide Liste FACTOR} %Fait Divide avec la Liste; {FindHigh Liste} permet de trouver par quel facteur il faut diviser
-      else
-	 Liste
+      
+      {Divide Liste {FindHigh Liste}} %Fait Divide avec la Liste; {FindHigh Liste} permet de trouver par quel facteur il faut diviser
+      
+   end
+   
+end
+%{Browse {Normaliser [10.0 9.0 ~1.0 ~21.0]}}
+
+
+declare Merge
+fun{Merge Liste}
+   local First Run in
+      First = {NewCell [0.0]}
+      fun{Run L}
+	 case L
+	 of nil then @First
+	 [] H|T then
+	    
+	    case H
+	    of A#B then
+	       First := {SumList @First 1.0 B A}
+	       {Run T}
+	    end
+	    
+	 end
       end
+      {Normaliser {Run Liste}}
    end
 end
-
-
 %{Browse {Merge [1.0#[2.0 2.0 2.0 2.0] 2.0#[3.0 3.0 3.0 3.0 3.0 3.0]]}}
 
 
@@ -414,10 +537,12 @@ fun{Repeat Natural Music}
 	 if N=<Natural then
 	    {Append Music {For N+1}}
 	 end
+
       end
       	 {For 1}
    end
 end
+
 
 %%%%%%%%%%%%%CLIP
 %%%%%%%INPUT:  Low (float) High(float) Music([lsite])
@@ -425,17 +550,21 @@ end
 declare Clip
 fun{Clip Low High Music}
    local Recurs in
+      
       fun{Recurs Liste}
 	 case Liste
 	 of H|T then
+	    
 	    if H>High then High|{Recurs T}
 	     elseif H<Low then Low|{Recurs T}
 	    else
 	       H|{Recurs T}
 	    end
+	    
 	 else nil
 	 end 
       end%end function
+      
       {Recurs Music}
    end
 end
@@ -447,6 +576,7 @@ end
 declare Echo
 fun {Echo Delay Decay Music}
    local  SilenceList SamplesToSilence SonAvecEcho in
+
       SamplesToSilence = {Float.toInt Delay*44100.0}
       fun {SilenceList N}%finit par a|a et pas a|a|nil
 	 if N < SamplesToSilence then
@@ -460,7 +590,9 @@ fun {Echo Delay Decay Music}
       {Mix P2T [merge(1.0#Music Decay#SonAvecEcho)]}
       %{SilenceList 1}|nil
    end
+   
 end
+
 
 %%%%%%%%%%%%%LOOP
 %%%%%%%INPUT:  Duree (fl) Music(list)
@@ -468,21 +600,32 @@ end
 declare Loop
 fun{Loop Duree Music}
    local Recursion NombreTotalSample in
+      
       NombreTotalSample = {Float.toInt Duree*44100.0}
       fun{Recursion N Liste}
+
+
 	 if N=<NombreTotalSample then 
+	    
 	    case Liste
 	    of H|nil then
 	       H|{Recursion N+1 Music}
 	    [] H|T then
 	       H|{Recursion N+1 T}
 	    end
+	    
 	 else nil
-	 end	 
+	    
+	 end
+
+		 
       end
       {Recursion 1 Music}
    end
 end
+
+
+
 
 %%%%%%%%%%%%%REVERSE
 %%%%%%%INPUT:  Music sous forme a1|a2|a3|nil a appartient ai[-1;1]
@@ -491,6 +634,8 @@ declare Reverse
 fun{Reverse Music}
    {List.reverse Music $}
 end
+
+
 
 %%%%%%%%%%%%%FADE
 %%%%%%%INPUT:  Music
@@ -515,6 +660,9 @@ fun{Fade Start Out Music}
 	       
 	    end
 	 end
+	 
+	 
+	 
       end
       A1 = {Increment 1 Music StartEch}
       A2 = {Reverse A1}
@@ -540,11 +688,17 @@ fun{Cut Start Finish Music}
 	       else
 		  H|{Recursion N+1 T}
 	       end
+	       
 	    end
+	    
+	    
 	 else nil end
+	 
       end
+      
       {Recursion 1 Music}
    end
+   
 end
 %{Browse {Cut 4.0 9.0 [1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 ]}}
 %{Browse 1}
@@ -552,126 +706,46 @@ end
 declare SampledFilter
 fun {SampledFilter Filtre}
    case Filtre of nil then nil
-   [] repeat(amout:I M) then {Repeat I {Mix P2T M}}
-   [] loop(duration:D M) then {Loop D {Mix P2T M}}
-   [] clip(low:S1 high:S2 M) then {Clip S1 S2 {Mix P2T M}}
-   [] echo(delay:D1 decay:D2 M) then {Echo D1 D2 {Mix P2T M}}
-   [] fade(start:D1 out:D2 M) then {Fade D1 D2 {Mix P2T M}}
-   [] cut(start:D1 finish:D2 M) then {Cut D1 D2 {Mix P2T M}}
-   [] reverse(M) then {Reverse {Mix P2T M}}
+   [] repeat(amout:I M) then {Repeat I M}
+   [] loop(duration:D M) then {Loop D M}
+   [] clip(low:S1 high:S2 M) then {Clip S1 S2 M}
+   [] echo(delay:D1 decay:D2 M) then {Echo D1 D2 M}
+   [] fade(start:D1 out:D2 M) then {Fade D1 D2 M}
+   [] cut(start:D1 finish:D2 M) then {Cut D1 D2 M}
+   [] reverse(M) then {Reverse M}
    end
 end
-   
+
+      
 %-------------------END ZONE DES FILTRES--------------------------
 
-declare Pi
-Pi = 3.14159265359
+
+
+declare PartToSample
 %--- INPUT: ​part
 %---OOUTPUT: samples
-fun {Mix P2T Music}
-   local SampledPart SampledPartition in
- % ------------------------------Fonction faisant appel à P2T-----------------------------------------
-    %1)
-      fun {SampledPartition Part}
-	 local SampledNote SampledChord ExtPart Parcours in
-	    ExtPart = {P2T Part} %%%%%%%%%%%%%%%%%%% L FAUT ABSOLUMENT METTRE P2T APRES
-	    fun {SampledNote ExtNote}
-	       
-	       local  F A H Samp Recursive in
-		  H = {Int.toFloat {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}}} % on fixe le La comme 0 (reference)
-		  F = {Pow 2.0 H/12.0}
-		  Samp = {Float.toInt 44100.0*ExtNote.duration}
+fun {PartToSample Part}
+   local SampledPart in
 
-		  fun {Recursive N}
-		     if N =< Samp-1 then
-			0.5*{Sin 2.0*Pi*F*{Int.toFloat N}/44100.0}|{Recursive N+1}
-		     else
-			nil
-		     end
-		  end
-		  A = {Recursive 0}
-		  A
-	       end
-	    end
-
-	    fun {SampledChord ExtChord}
-	       local Frequences Recursive Samp SumSinus F in
-		  Samp = {Float.toInt 44100.0*ExtChord.duration}%ExtChord.duration}
-		  fun {Frequences EChord}      % renvoie une liste avec les frequence de chaque note de l'accord
-		     case EChord of nil then nil
-		     [] S|T then
-			{Pow 2.0 {Int.toFloat {GetNumber S}-{GetNumber {NoteToExtended a4}}}/12.0}|{Frequences T} %{Int.toFloat {GetNumber S}-{GetNumber {NoteToExtended a4}}}/12.0}|{Frequences T}
-		     end
-		  end
-
-		  F = {Frequences ExtChord}
-		  fun {SumSinus Freq M} % un Ai d'un accord
-		     case Freq of nil then 0.0
-		     [] S|T then
-			0.5*{Sin 2.0*Pi*S*{Int.toFloat M}}/44100.0+{SumSinus T M}
-		     end
-		  end
-		  fun {Recursive N}% creer la tableau d'echantillions	 
-		     if N < Samp-1 then 
-			{SumSinus F N}/{Int.toFloat {List.length F}}|{Recursive N+1}
-		     else
-			{SumSinus F N+1}/{Int.toFloat {List.length F}}
-		     end
-		  end
-		  {Recursive 0}
-	       end 
-	    end
-	    fun {Parcours EPart}
-	       case EPart of nil then nil
-	       []H|T then
-		  if {IsExtNote H} then {SampledNote H}|{Parcours T}
-		  else
-		     {SampledChord H}|{Parcours T}
-		  end
-	       end
-	    end
-	    {Parcours ExtPart}   
-	 end
-      end
-    
-      %2)
-      fun{Merge Liste}
-	 local First Run in
-	    First = {NewCell [0.0]}
-	    fun{Run L}
-	       case L
-	       of nil then @First
-	       [] H|T then 
-		  case H
-		  of A#B then
-		     First := {SumList @First 1.0 {Mix P2T B} A} %What is P2T? On ne sait pas, doit etre sous fonction de Mix pour y acceder
-		     {Run T}
-		  end
-	       end
-	    end
-	    {Normaliser {Run Liste}}
-	 end
-      end
-     % ---------------------------------End fonctions faisant appel a P2T----------
-
-      fun{SampledPart Music}
-	 case Music
+      fun{SampledPart PartElem}
+	 case PartElem
 	 of nil then nil
 	 []H|T then
 	    if {IsSamples H} then
-	       {List.append H {SampledPart T}}
+	       H|{SampledPart T}
 	    elseif {IsPartition H} then
-	       {List.append {SampledPartition H} {SampledPart T}}
+	       {SampledPartition H}|{SampledPart T}
 	    elseif {IsWave H} then
-	       {List.append {SampledWave H.1} {SampledPart T}}
+	      {SampledWave H.1}|{SampledPart T}
 	    elseif {IsMerge H} then
-	       {List.append {Merge H} {SampledPart T}}
+	       {Merge H}|{SampledPart T}
+
 	    else
-	       {List.Append {SampledFilter H} {SampledPart T}}
+	       {List.Append {SampledFilter H} {SampledPart T} $}
 	    end    
 	 end	
       end
-      {SampledPart Music}
+      {SampledPart Part}
    end 
    
 end
@@ -681,15 +755,15 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %{Browse {Drone a 4}}
-      Music = {Project.load 'joy.dj.oz'}
-      Start
+     % Music = {Project.load 'joy.dj.oz'}
+    %  Start
 
    % Uncomment next line to insert your tests.
    % \insert 'tests.oz'
    % !!! Remove this before submitting.
 
    %BEN DELCOIGNE A COMMENTE LA LIGNE SUIVANTE
-      Start = {Time}
+      %Start = {Time}
 
    % Uncomment next line to run your tests.
    % {Test Mix PartitionToTimedList}
@@ -698,13 +772,13 @@ end
    % warnings.
 
       %BEN DELCOIGNE A COMMENTE LA LIGNE SUIVANTE
-      {ForAll [NoteToExtended Music] Wait}
+     % {ForAll [NoteToExtended Music] Wait}
 
    % Calls your code, prints the result and outputs the result to `out.wav`.
    % You don't need to modify this.
 
       %BEN DELCOIGNE A COMMENTE LA LIGNE SUIVANTE
-      {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
+      %{Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
 
    % Shows the total time to run your code.
-   {Browse {IntToFloat {Time}-Start} / 1000.0}
+   %{Browse {IntToFloat {Time}-Start} / 1000.0}

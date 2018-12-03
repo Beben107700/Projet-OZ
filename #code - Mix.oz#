@@ -317,7 +317,7 @@ end
 
 declare SampledWave
 fun {SampledWave Filename}
-  ​[1.0] %{project.readFile Filename} %ATTENTION géréer erreur fichier illisible, inaccesible
+  ​[1.0]%{project.readFile Filename} %ATTENTION géréer erreur fichier illisible, inaccesible
 end
 
 %%%MERGE

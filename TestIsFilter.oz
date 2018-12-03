@@ -1,0 +1,95 @@
+local
+fun {IsSamples Part}
+      if {List.is Part} then
+	 if {Float.is Part.1} then
+	    true
+	 else
+	    false
+	 end
+      else
+	 false % ATTEntion il faut gérer quand liste est vide
+      end
+end
+
+fun {IsPartition Part}
+   if {List.is Part} then
+      if {IsExtNote Part.1} then
+	 true
+      else
+	 false
+      end
+   else
+      false
+   end
+end
+
+fun {IsWave Part}
+   {String.is Part.1}
+end
+
+fun {IsMerge Part}
+   case Part
+   of merge(1:Liste) then
+      case Liste.1
+      of P#M then
+	 {Float.is P}
+      else
+	 false
+      end
+   else false
+   end
+   
+   
+end
+
+fun{IsNote X}
+   if{Tuple.is X}then true
+   elseif {Atom.is X}then true
+   else false
+   end
+end
+
+fun{IsExtNote X}
+   if{Record.is X} then
+      case X
+      of note(name:A octave:B sharp:C duration:D instrument:E) then true
+      [] silence(duration:D) then true
+      else false
+      end
+   else
+      false
+   end  
+end
+
+
+S =[1.0 0.34 0.87]
+P =[note(name:a octave:4 sharp:true duration:1.0 instrument:none)]
+W = wave("alpha")
+
+Music1 = [1.0 0.34 0.87]
+Music2 = [1.0 0.34 0.87]
+M = merge([0.5#Music1 0.2#Music2])
+
+in
+   {Browse 'Wave'}
+   {Browse {IsWave S}}
+   {Browse {IsWave P}}
+   {Browse {IsWave W}}
+   {Browse {IsWave M}}
+   {Browse 'Samples'}
+   {Browse {IsSamples S}}
+   {Browse {IsSamples P}}
+   {Browse {IsSamples W}}
+   {Browse {IsSamples M}}
+   {Browse 'Partition'}
+   {Browse {IsPartition S}}
+   {Browse {IsPartition P}}
+   {Browse {IsPartition W}}
+   {Browse {IsPartition M}}
+   {Browse 'Merge'}
+   {Browse {IsMerge S}}
+   {Browse {IsMerge P}}
+   {Browse {IsMerge W}}
+   {Browse {IsMerge M}}
+
+end
