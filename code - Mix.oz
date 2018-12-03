@@ -21,15 +21,7 @@ fun{IsTrans X}
    end
 end
 
-fun{Transform X}
-   case X
-   of duration(seconds:S B) then {Duration S B}%appel a la fct duration
-   [] stretch(factor:S B) then {Stretch S B}%appel a la fct stretch
-   [] drone(note:S amount:B)then {Drone S B}%appel a drone
-   [] transpose(semitones:S B)then {Transpose S B}%appel a transpose
-   else false
-   end
-end
+
 
 fun{IsNote X}
    if{Tuple.is X}then true
@@ -78,6 +70,16 @@ end
 
 
 %---------------------ZONE DES TRANSFORMATIONS ----------------------
+
+fun{Transform X}
+   case X
+   of duration(seconds:S B) then {Duration S B}%appel a la fct duration
+   [] stretch(factor:S B) then {Stretch S B}%appel a la fct stretch
+   [] drone(note:S amount:B)then {Drone S B}%appel a drone
+   [] transpose(semitones:S B)then {Transpose S B}%appel a transpose
+   else false
+   end
+end
 
 fun{Stretch Fact Part}   
    local StretchExt in
@@ -331,11 +333,7 @@ fun {IsMerge Part}
 end
 
 
-declare IsFilter
-fun {IsFilter Part}
-   true
- % pas nécessaire je pense
-end
+
 
 
 %----------------------END ZONE IS-------------------
@@ -350,10 +348,12 @@ fun {SampledPartition Part}
    local SampledNote SampledChord ExtPart Parcours in
       ExtPart = {PartitionToTimedList Part} %%%%%%%%%%%%%%%%%%% L FAUT ABSOLUMENT METTRE P2T APRES
       fun {SampledNote ExtNote}
+
 	 local  F A H Samp Recursive in
 	    H = {Int.toFloat {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}}} % on fixe le La comme 0 (reference)
 	    F = {Pow 2.0 H/12.0}
 	    Samp = {Float.toInt 44100.0*ExtNote.duration}
+
 	    fun {Recursive N}
 	       if N =< Samp-1 then
 		  0.5*{Sin 2.0*Pi*F*{Int.toFloat N}/44100.0}|{Recursive N+1}
@@ -365,6 +365,7 @@ fun {SampledPartition Part}
 	    A
 	 end
       end
+
      fun {SampledChord ExtChord}
 	 local Frequences Recursive Samp SumSinus F in
 	    Samp = {Float.toInt 44100.0*ExtChord.duration}%ExtChord.duration}
@@ -706,13 +707,13 @@ end
 declare SampledFilter
 fun {SampledFilter Filtre}
    case Filtre of nil then nil
-   [] repeat(amout:I M) then {Repeat I M}
-   [] loop(duration:D M) then {Loop D M}
-   [] clip(low:S1 high:S2 M) then {Clip S1 S2 M}
-   [] echo(delay:D1 decay:D2 M) then {Echo D1 D2 M}
-   [] fade(start:D1 out:D2 M) then {Fade D1 D2 M}
-   [] cut(start:D1 finish:D2 M) then {Cut D1 D2 M}
-   [] reverse(M) then {Reverse M}
+   [] repeat(amout:I M) then {Repeat I {Mix P2T M}}
+   [] loop(duration:D M) then {Loop D {Mix P2T M}}
+   [] clip(low:S1 high:S2 M) then {Clip S1 S2 {Mix P2T M}}
+   [] echo(delay:D1 decay:D2 M) then {Echo D1 D2 {Mix P2T M}}
+   [] fade(start:D1 out:D2 M) then {Fade D1 D2 {Mix P2T M}}
+   [] cut(start:D1 finish:D2 M) then {Cut D1 D2 {Mix P2T M}}
+   [] reverse(M) then {Reverse {Mix P2T M}}
    end
 end
 
@@ -724,28 +725,27 @@ end
 declare PartToSample
 %--- INPUT: ​part
 %---OOUTPUT: samples
-fun {PartToSample Part}
+fun {Mix P2T Music}
    local SampledPart in
 
-      fun{SampledPart PartElem}
-	 case PartElem
+      fun{SampledPart Music}
+	 case Music
 	 of nil then nil
 	 []H|T then
 	    if {IsSamples H} then
-	       H|{SampledPart T}
+	       {List.append H {SampledPart T}}
 	    elseif {IsPartition H} then
-	       {SampledPartition H}|{SampledPart T}
+	       {List.append {SampledPartition H} {SampledPart T}}
 	    elseif {IsWave H} then
-	      {SampledWave H}|{SampledPart T}
+	       {List.append {SampledWave H} {SampledPart T}}
 	    elseif {IsMerge H} then
-	       {Merge H}|{SampledPart T}
-
+	       {List.append {Merge H} {SampledPart T}}
 	    else
-	       {List.Append {SampledFilter H} {SampledPart T} $}
+	       {List.Append {SampledFilter H} {SampledPart T}}
 	    end    
 	 end	
       end
-      {SampledPart Part}
+      {SampledPart Music}
    end 
    
 end
