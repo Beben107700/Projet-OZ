@@ -1,7 +1,7 @@
 declare IsTrans Transform IsNote IsExtNote IsChord IsExtChord Stretch NoteToExtended ChordToExtended PartitionToTimedList Mix Drone GetDuration GetNote GetNumber Transpose
    % See project statement for API details.
- %  [Project] = {Link ['Project2018.ozf']}
-  % Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
+  % [Project] = {Link ['Project2018.ozf']}
+   % Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%bien le bonsoir
 %%%%
@@ -756,14 +756,14 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %{Browse {Drone a 4}}
      % Music = {Project.load 'joy.dj.oz'}
-    %  Start
+     % Start
 
    % Uncomment next line to insert your tests.
    % \insert 'tests.oz'
    % !!! Remove this before submitting.
 
    %BEN DELCOIGNE A COMMENTE LA LIGNE SUIVANTE
-      %Start = {Time}
+     % Start = {Time}
 
    % Uncomment next line to run your tests.
    % {Test Mix PartitionToTimedList}
@@ -778,7 +778,7 @@ end
    % You don't need to modify this.
 
       %BEN DELCOIGNE A COMMENTE LA LIGNE SUIVANTE
-      %{Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
+     % {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
 
    % Shows the total time to run your code.
    %{Browse {IntToFloat {Time}-Start} / 1000.0}
