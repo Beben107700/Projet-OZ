@@ -28,17 +28,18 @@ fun {IsWave Part}
 end
 
 fun {IsMerge Part}
-   if {List.is Part} then
-      
-      case Part.1
+   case Part
+   of merge(1:Liste) then
+      case Liste.1
       of P#M then
 	 {Float.is P}
       else
 	 false
       end
-   else
-      false  
+   else false
    end
+   
+   
 end
 
 fun{IsNote X}
@@ -63,29 +64,32 @@ end
 
 S =[1.0 0.34 0.87]
 P =[note(name:a octave:4 sharp:true duration:1.0 instrument:none)]
-W = wave('alpha')
-M = merge([0.5#Music1 0.2#Music2])
+W = wave("alpha")
+
 Music1 = [1.0 0.34 0.87]
 Music2 = [1.0 0.34 0.87]
+M = merge([0.5#Music1 0.2#Music2])
 
 in
-{Browse {IsWave S}}
-{Browse {IsWave P}}
-{Browse {IsWave W}}
-{Browse {IsWave M}}
+   {Browse 'Wave'}
+   {Browse {IsWave S}}
+   {Browse {IsWave P}}
+   {Browse {IsWave W}}
+   {Browse {IsWave M}}
+   {Browse 'Samples'}
+   {Browse {IsSamples S}}
+   {Browse {IsSamples P}}
+   {Browse {IsSamples W}}
+   {Browse {IsSamples M}}
+   {Browse 'Partition'}
+   {Browse {IsPartition S}}
+   {Browse {IsPartition P}}
+   {Browse {IsPartition W}}
+   {Browse {IsPartition M}}
+   {Browse 'Merge'}
+   {Browse {IsMerge S}}
+   {Browse {IsMerge P}}
+   {Browse {IsMerge W}}
+   {Browse {IsMerge M}}
 
-{Browse {IsSamples S}}
-{Browse {IsSamples P}}
-{Browse {IsSamples W}}
-{Browse {IsSamples M}}
-
-{Browse {IsPartition S}}
-{Browse {IsPartition P}}
-{Browse {IsPartition W}}
-{Browse {IsPartition M}}
-
-{Browse {IsMerge S}}
-{Browse {IsMerge P}}
-{Browse {IsMerge W}}
-{Browse {IsMerge M}}
 end

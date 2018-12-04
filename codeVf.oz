@@ -301,6 +301,21 @@ local
 	 false  
       end
    end
+    fun{IsFilter Filter}
+      case Filter of nil then true
+      [] repeat(amout:I M) then true
+      [] loop(duration:D M) then true
+      [] clip(low:S1 high:S2 M) then true
+      [] echo(delay:D1 decay:D2 M) then true
+      [] fade(start:D1 out:D2 M) then true
+      [] cut(start:D1 finish:D2 M) then true
+      [] reverse(M) then true
+      else
+   false
+   
+      end
+      
+   end
 
 %----------------------END ZONE IS-------------------
 
@@ -528,7 +543,7 @@ local
 
 
 %-------------------END ZONE DES FILTRES--------------------------
-
+    C = {NewCell nil}
 
    Pi = 3.14159265359
 %--- INPUT: ​part
@@ -664,8 +679,10 @@ local
 		  {List.append {SampledWave H.1} {SampledPart T}}
 	       elseif {IsMerge H} then
 		  {List.append {Merge H} {SampledPart T}}
-	       else
+	       elseif {IsFilter H} then
 		  {List.append {SampledFilter H} {SampledPart T}}
+	       else
+		 C := H|@C
 	       end    
 	    end	
 	 end
@@ -696,6 +713,9 @@ in
    % Calls your code, prints the result and outputs the result to `out.wav`.
    % You don't need to modify this.
    {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
+   {Browse @C}
+
+
    
    % Shows the total time to run your code.
    {Browse {IntToFloat {Time}-Start} / 1000.0}

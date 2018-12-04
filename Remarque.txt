@@ -1,2 +1,11 @@
 Il faut mettre les fct qui utilisent PartitionToTimedList en sous-fct
 de Mix car elles doivent utiliser P2T
+OK
+
+SampledPartition modifié : ExtChord.duration => ExtChord.1.duration
+
+SampledPartition testé et oké
+
+
+
+

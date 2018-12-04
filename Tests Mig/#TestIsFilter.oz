@@ -7,7 +7,7 @@ local
 	    false
 	 end
       else
-	 false % ATTEntion il faut gérer quand liste est vide
+	 false % ATTEntion il faut gÃ©rer quand liste est vide
       end
    end
 

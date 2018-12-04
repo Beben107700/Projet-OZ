@@ -301,6 +301,21 @@ local
 	 false  
       end
    end
+    fun{IsFilter Filter}
+      case Filter of nil then true
+      [] repeat(amout:I M) then true
+      [] loop(duration:D M) then true
+      [] clip(low:S1 high:S2 M) then true
+      [] echo(delay:D1 decay:D2 M) then true
+      [] fade(start:D1 out:D2 M) then true
+      [] cut(start:D1 finish:D2 M) then true
+      [] reverse(M) then true
+      else
+   false
+   
+      end
+      
+   end
 
 %----------------------END ZONE IS-------------------
 
@@ -561,7 +576,7 @@ local
 
 	       fun {SampledChord ExtChord}
 		  local Frequences Recursive Samp SumSinus F in
-		     Samp = {Float.toInt 44100.0*ExtChord.duration}%ExtChord.duration}
+		     Samp = {Float.toInt 44100.0*ExtChord.1.duration}%ExtChord.duration}
 		     fun {Frequences EChord}      % renvoie une liste avec les frequence de chaque note de l'accord
 			case EChord of nil then nil
 			[] S|T then
@@ -664,8 +679,10 @@ local
 		  {List.append {SampledWave H.1} {SampledPart T}}
 	       elseif {IsMerge H} then
 		  {List.append {Merge H} {SampledPart T}}
-	       else
+	       elseif {IsFilter H} then
 		  {List.append {SampledFilter H} {SampledPart T}}
+      else
+      {Browse H}
 	       end    
 	    end	
 	 end
