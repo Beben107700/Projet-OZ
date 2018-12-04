@@ -290,9 +290,8 @@ local
    end
 
    fun {IsMerge Part}
-      if {List.is Part} then
-	 
-	 case Part.1
+      case Part of merge(Liste) then
+	 case Liste.1
 	 of P#M then
 	    {Float.is P}
 	 else
@@ -630,6 +629,7 @@ local
 	    [] cut(start:D1 finish:D2 M) then {Cut D1 D2 {Mix P2T M}}
 	    [] reverse(M) then {Reverse {Mix P2T M}}
 	    end
+	  
 	 end
 
 	 %4)

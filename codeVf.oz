@@ -561,7 +561,7 @@ local
 
 	       fun {SampledChord ExtChord}
 		  local Frequences Recursive Samp SumSinus F in
-		     Samp = {Float.toInt 44100.0*ExtChord.duration}%ExtChord.duration}
+		     Samp = {Float.toInt 44100.0*ExtChord.1.duration}%ExtChord.duration}
 		     fun {Frequences EChord}      % renvoie une liste avec les frequence de chaque note de l'accord
 			case EChord of nil then nil
 			[] S|T then
@@ -628,8 +628,6 @@ local
 	    [] fade(start:D1 out:D2 M) then {Fade D1 D2 {Mix P2T M}}
 	    [] cut(start:D1 finish:D2 M) then {Cut D1 D2 {Mix P2T M}}
 	    [] reverse(M) then {Reverse {Mix P2T M}}
-	    else
-	      [1.0]
 	    end
 	  
 	 end
