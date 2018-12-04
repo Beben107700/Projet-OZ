@@ -11,5 +11,6 @@ local
    Partition = {Flatten [Tune End1 Tune End2 Interlude Tune End2]}
 in
    % This is a music :)
+   %[partition([a b])]
    [partition(Partition)]
 end
