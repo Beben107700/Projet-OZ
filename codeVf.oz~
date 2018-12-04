@@ -607,14 +607,14 @@ local
 		     fun {SumSinus Freq M} % un Ai d'un accord
 			case Freq of nil then 0.0
 			[] S|T then
-			   0.5*{Sin 2.0*Pi*S*{Int.toFloat M}}/44100.0+{SumSinus T M}
+			   0.5*{Sin 2.0*Pi*S*{Int.toFloat M}/44100.0}+{SumSinus T M} %%%%%%%%%% ICI %%%%%%%%%%%%%%%
 			end
 		     end
 		     fun {Recursive N}% creer la tableau d'echantillions	 
-			if N < Samp-1 then 
+			if N < Samp then 
 			   {SumSinus F N}/{Int.toFloat {List.length F}}|{Recursive N+1}
 			else
-			   {SumSinus F N+1}/{Int.toFloat {List.length F}}
+			   nil  %%%%%%%%%%%%%%%%%  ICI  %%%%%%%%%%%%%%%%%%%%%%%
 			end
 		     end
 		     {Recursive 0}
@@ -625,7 +625,7 @@ local
 		  []H|T then
 		     if {IsExtNote H} then {Append {SampledNote H} {Parcours T}}
 		     else
-			{Append {SampledChord H} {Parcours T}}
+			 {Append {SampledChord H} {Parcours T}}
 		     end
 		  end
 	       end
@@ -713,7 +713,7 @@ local
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'joy.dj.oz'}
+   Music = {Project.load 'Test.dj.oz'}
    Start
 
    % Uncomment next line to insert your tests.
