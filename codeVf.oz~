@@ -261,32 +261,36 @@ local
 %---------------------- ZONE DES IS-------------------
 
    fun {IsSamples Part}
-      if {List.is Part} then
-	 if {Float.is Part.1} then
-	    true
-	 else
-	    false
-	 end
-      else
-	 false % ATTEntion il faut gérer quand liste est vide
+      case Part
+      of samples(Samples) then
+	 {Float.is Samples.1}
+      else false
       end
+      
    end
 
 
    fun {IsPartition Part}
-      if {List.is Part} then
-	 if {IsExtChord Part.1} orelse {IsExtNote Part.1}orelse  {IsNote Part.1}orelse {IsChord Part.1} orelse{IsTrans Part.1} then
+      case Part
+      of partition(1:L) then
+
+	 if {IsExtChord L.1} orelse {IsExtNote L.1}orelse  {IsNote L.1}orelse {IsChord L.1} orelse{IsTrans L.1} then
 	    true
 	 else
 	    false
 	 end
-      else
-	 false
+	 
+      else false
       end
+      
    end
 
    fun {IsWave Part}
-      {String.is Part.1}
+      case Part of
+	 wave(FileName) then true
+      else false end
+      
+      %{String.is Part.1}
    end
 
    fun {IsMerge Part}
@@ -446,7 +450,7 @@ local
 	 {Recurs Music}
       end
    end
-   {Browse {Clip ~1.0 1.0 [1.0 2.0 0.64 38.2 ~22.0]}}
+   %{Browse {Clip ~1.0 1.0 [1.0 2.0 0.64 38.2 ~22.0]}}
 
 %%%%%%%%%%%%%Echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   Necessite MERGE
 %%%%%%%INPUT:  Delay (fl) Delay (fl) MUsic(list)
@@ -543,12 +547,13 @@ local
 
 
 %-------------------END ZONE DES FILTRES--------------------------
-
+    C = {NewCell nil}
 
    Pi = 3.14159265359
 %--- INPUT: ​part
 %---OOUTPUT: samples
    fun {Mix P2T Music}
+      
       local SampledPart Merge Echo SampledFilter SampledPartition in
  % ------------------------------Fonction faisant appel à P2T-----------------------------------------
     %1)
@@ -672,17 +677,17 @@ local
 	    of nil then nil
 	    []H|T then
 	       if {IsSamples H} then
-		  {List.append H {SampledPart T}}
+		  {List.append H.1 {SampledPart T}}
 	       elseif {IsPartition H} then
-		  {List.append {SampledPartition H} {SampledPart T}}
+		  {List.append {SampledPartition H.1} {SampledPart T}}
 	       elseif {IsWave H} then
 		  {List.append {SampledWave H.1} {SampledPart T}}
 	       elseif {IsMerge H} then
-		  {List.append {Merge H} {SampledPart T}}
+		  {List.append {Merge H.1} {SampledPart T}}
 	       elseif {IsFilter H} then
 		  {List.append {SampledFilter H} {SampledPart T}}
-      else
-      {Browse H}
+	       else
+		 C := H
 	       end    
 	    end	
 	 end
@@ -713,6 +718,10 @@ in
    % Calls your code, prints the result and outputs the result to `out.wav`.
    % You don't need to modify this.
    {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
+   {Browse @C}
+   %{Browse {IsPartition}}
+
+
    
    % Shows the total time to run your code.
    {Browse {IntToFloat {Time}-Start} / 1000.0}

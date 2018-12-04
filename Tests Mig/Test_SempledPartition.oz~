@@ -248,7 +248,7 @@ local
       end
    end
 
-   Partition1 = [b2 b#6 c4 [a#3 b7 c] d#5 stretch([b] factor:1.5)]
+   Partition1 = [b2 b#6 c4 [a#3 b7 c] d#5 strech([b] factor:1.5)]
 
 
 

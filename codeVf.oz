@@ -261,32 +261,36 @@ local
 %---------------------- ZONE DES IS-------------------
 
    fun {IsSamples Part}
-      if {List.is Part} then
-	 if {Float.is Part.1} then
-	    true
-	 else
-	    false
-	 end
-      else
-	 false % ATTEntion il faut gérer quand liste est vide
+      case Part
+      of samples(Samples) then
+	 {Float.is Samples.1}
+      else false
       end
+      
    end
 
 
    fun {IsPartition Part}
-      if {List.is Part} then
-	 if {IsExtChord Part.1} orelse {IsExtNote Part.1}orelse  {IsNote Part.1}orelse {IsChord Part.1} orelse{IsTrans Part.1} then
+      case Part
+      of partition(1:L) then
+
+	 if {IsExtChord L.1} orelse {IsExtNote L.1}orelse  {IsNote L.1}orelse {IsChord L.1} orelse{IsTrans L.1} then
 	    true
 	 else
 	    false
 	 end
-      else
-	 false
+	 
+      else false
       end
+      
    end
 
    fun {IsWave Part}
-      {String.is Part.1}
+      case Part of
+	 wave(FileName) then true
+      else false end
+      
+      %{String.is Part.1}
    end
 
    fun {IsMerge Part}
@@ -301,7 +305,7 @@ local
 	 false  
       end
    end
-    fun{IsFilter Filter}
+   fun{IsFilter Filter}
       case Filter of nil then true
       [] repeat(amout:I M) then true
       [] loop(duration:D M) then true
@@ -311,8 +315,8 @@ local
       [] cut(start:D1 finish:D2 M) then true
       [] reverse(M) then true
       else
-   false
-   
+	 false
+	 
       end
       
    end
@@ -337,7 +341,6 @@ local
 %%%%%%%%%%%SumList
 %INPUT: L1 I1 L2 I2 --> listes associees a une intensite. I1 et I2 sont entre 0 et 1
 %OUTPUT: Leur somme ponderee
-
    fun{SumList L1 I1 L2 I2}
       local Recurs in
 	 
@@ -349,17 +352,25 @@ local
 	       []O|P then %On fait l'operation avec uniquement la deuxieme liste
 		  O|{Recurs nil P}
 	       end
+	       
+	       
 	    [] H|T then %Premiere liste non finie
+
+
+	       
 	       case Second
 	       of nil then %On fait l'operation avec uniquement la premiere liste
 		  H|{Recurs T nil}	       
 	       [] X|U then %dans le cas ou les deux ne sont pas finies
 		  (I1*X)+(I2*H)|{Recurs T U}
-	       end  
+	       end
+	       
 	    end
+	    
 	 end
 	 {Recurs L1 L2}
-      end 
+      end
+      
    end
 %{Browse {SumList [1.0 1.0 1.0 1.0 1.0 2.0] 2.0 [2.0 2.0 2.0 2.0] 1.0}}
 
@@ -369,9 +380,9 @@ local
 
    fun{Normaliser Liste}
       local FindHigh Smallest Largest Divide FACTOR in
+	 
 	 Smallest = {NewCell 2000.0}
 	 Largest = {NewCell ~2000.0}
-
 	 fun{FindHigh L} %Cette fonction renvoie le plus grand nombre trouve dans la liste
 	    case L
 	    of nil then
@@ -384,22 +395,29 @@ local
 	       else
 		  {FindHigh T}
 	       end
+	       
 	    end
+	    
 	 end
+
 	 fun{Divide L Facteur}
 	    case L
 	    of nil then nil
 	    []H|T then
 	       H/Facteur|{Divide T Facteur}
 	    end
+	    
 	 end
-	 thread FACTOR = {FindHigh Liste} end
+	 thread FACTOR = {Number.abs {FindHigh Liste}} end
 	 if FACTOR > 1.0 then
 	    {Divide Liste FACTOR} %Fait Divide avec la Liste; {FindHigh Liste} permet de trouver par quel facteur il faut diviser
 	 else
 	    Liste
 	 end
+	 
+	 
       end
+      
    end
 
 
@@ -446,13 +464,13 @@ local
 	 {Recurs Music}
       end
    end
-   {Browse {Clip ~1.0 1.0 [1.0 2.0 0.64 38.2 ~22.0]}}
+   %{Browse {Clip ~1.0 1.0 [1.0 2.0 0.64 38.2 ~22.0]}}
 
 %%%%%%%%%%%%%Echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   Necessite MERGE
 %%%%%%%INPUT:  Delay (fl) Delay (fl) MUsic(list)
 %%%%%%%OUTPUT: Music(list) avec un echo
 
- 
+   
 
 %%%%%%%%%%%%%LOOP
 %%%%%%%INPUT:  Duree (fl) Music(list)
@@ -549,6 +567,7 @@ local
 %--- INPUT: ​part
 %---OOUTPUT: samples
    fun {Mix P2T Music}
+      
       local SampledPart Merge Echo SampledFilter SampledPartition in
  % ------------------------------Fonction faisant appel à P2T-----------------------------------------
     %1)
@@ -672,17 +691,17 @@ local
 	    of nil then nil
 	    []H|T then
 	       if {IsSamples H} then
-		  {List.append H {SampledPart T}}
+		  {List.append H.1 {SampledPart T}}
 	       elseif {IsPartition H} then
-		  {List.append {SampledPartition H} {SampledPart T}}
+		  {List.append {SampledPartition H.1} {SampledPart T}}
 	       elseif {IsWave H} then
 		  {List.append {SampledWave H.1} {SampledPart T}}
 	       elseif {IsMerge H} then
-		  {List.append {Merge H} {SampledPart T}}
+		  {List.append {Merge H.1} {SampledPart T}}
 	       elseif {IsFilter H} then
 		  {List.append {SampledFilter H} {SampledPart T}}
 	       else
-		 C := H|@C
+		 C := H
 	       end    
 	    end	
 	 end
@@ -714,6 +733,7 @@ in
    % You don't need to modify this.
    {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
    {Browse @C}
+   %{Browse {IsPartition}}
 
 
    
