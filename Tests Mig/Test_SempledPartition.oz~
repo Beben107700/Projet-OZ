@@ -306,9 +306,9 @@ local
 	 fun {Parcours EPart}
 	    case EPart of nil then nil
 	    []H|T then
-	       if {IsExtNote H} then {SampledNote H}|{Parcours T}
+	       if {IsExtNote H} then {Append {SampledNote H} {Parcours T}}
 	       else
-		  {SampledChord H}|{Parcours T}
+		  {Append {SampledChord H} {Parcours T}}
 	       end
 	    end
 	 end
@@ -317,7 +317,7 @@ local
    end
 in
 
-   {Browse {SampledPartition PartitionToTimedList [a a]}}
+   {Browse {SampledPartition PartitionToTimedList [[a b]]}}
 
 
 end

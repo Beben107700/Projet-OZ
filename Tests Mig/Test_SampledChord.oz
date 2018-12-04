@@ -248,100 +248,42 @@ local
       end
    end
 
-   Partition1 = [b2 b#6 c4 [a#3 b7 c] d#5 stretch([b] factor:1.5)]
 
+%--------------------------------------FIN de PartitionToTimedList---------------------------------------------------------
+%--------------------------------------------------------------------------------------------------------------------------
+   
 
-
-%----------------------------------------------------------
-
-   fun {SampledPartition P2T Part}
-      local SampledNote SampledChord ExtPart Parcours in
-	 ExtPart = {P2T Part} %%%%%%%%%%%%%%%%%%% L FAUT ABSOLUMENT METTRE P2T APRES
-	 fun {SampledNote ExtNote}
-	    
-	    local  F A H Samp Recursive in
-	       H = {Int.toFloat {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}}} % on fixe le La comme 0 (reference)
-	       F = {Pow 2.0 H/12.0}*440.0
-	       Samp = {Float.toInt 10.0*ExtNote.duration}%BENDELCOIBNE
-
-	       fun {Recursive N}
-		  if N =< Samp-1 then
-		     0.5*{Sin 2.0*Pi*F*{Int.toFloat N}/44100.0}|{Recursive N+1}
-		  else
-		     nil
-		  end
-	       end
-	       A = {Recursive 0}
-	       A
+   fun {SampledChord ExtChord} %%%%%%ICI%%%%%%%% RENVOI une liste sans nil de sample 
+      local Frequences Recursive Samp SumSinus F in
+	 Samp = {Float.toInt 10.0*ExtChord.1.duration}%ExtChord.duration} %%%%%%%%%%%%%%%%%%%%% ATTENTION 10 => 44100
+	 fun {Frequences EChord}      % renvoie une liste avec les frequence de chaque note de l'accord
+	    case EChord of nil then nil
+	    [] S|T then
+	       {Pow 2.0 {Int.toFloat {GetNumber S}-{GetNumber {NoteToExtended a4}}}/12.0}*440.0|{Frequences T} %{Int.toFloat {GetNumber S}-{GetNumber {NoteToExtended a4}}}/12.0}|{Frequences T}
 	    end
 	 end
 
-	 fun {SampledChord ExtChord}
-	    local Frequences Recursive Samp SumSinus F in
-	       Samp = {Float.toInt 10.0*ExtChord.1.duration}%ExtChord.duration}
-	       fun {Frequences EChord}      % renvoie une liste avec les frequence de chaque note de l'accord
-		  case EChord of nil then nil
-		  [] S|T then
-		     {Pow 2.0 {Int.toFloat {GetNumber S}-{GetNumber {NoteToExtended a4}}}/12.0}*440.0|{Frequences T} %{Int.toFloat {GetNumber S}-{GetNumber {NoteToExtended a4}}}/12.0}|{Frequences T}
-		  end
-	       end
-
-	       F = {Frequences ExtChord}
-	       fun {SumSinus Freq M} % un Ai d'un accord
-		  case Freq of nil then 0.0
-		  [] S|T then
-		     0.5*{Sin 2.0*Pi*S*{Int.toFloat M}/44100.0}+{SumSinus T M}
-		  end
-	       end
-	       fun {Recursive N}% creer la tableau d'echantillions	 
-		  if N < Samp then 
-		     {SumSinus F N}/{Int.toFloat {List.length F}}|{Recursive N+1} %%%%%% ICI %%%%%%%%%%
-		  else
-		     nil% {SumSinus F N+1}/{Int.toFloat {List.length F}}
-		  end
-	       end
-	       {Recursive 0}
-	    end 
-	 end
-	 fun {Parcours EPart}
-	    case EPart of nil then nil
-	    []H|T then
-	       if {IsExtNote H} then {Append {SampledNote H} {Parcours T}}
-	       else
-		  {Append {SampledChord H} {Parcours T}}
-	       end
+	 F = {Frequences ExtChord}
+	 fun {SumSinus Freq M} % un Ai d'un accord
+	    case Freq of nil then 0.0
+	    [] S|T then
+	       0.5*{Sin 2.0*Pi*S*{Int.toFloat M}}/44100.0+{SumSinus T M}
 	    end
 	 end
-	 {Parcours ExtPart}   
-      end
+	 fun {Recursive N}% creer la tableau d'echantillions	 
+	    if N < Samp-1 then 
+	       {SumSinus F N}/{Int.toFloat {List.length F}}|{Recursive N+1}
+	    else
+	       {SumSinus F N+1}/{Int.toFloat {List.length F}}
+	    end
+	 end
+	 {Recursive 0}
+      end 
    end
+
+   EChord = {PartitionToTimedList [a b c]}
+
 in
-
-   {Browse {SampledPartition PartitionToTimedList [a [a b]]}}
-
-
+   {Browse  EChord}
+   {Browse {SampledChord EChord}}
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

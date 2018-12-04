@@ -6,6 +6,15 @@ SampledPartition modifié : ExtChord.duration => ExtChord.1.duration
 
 SampledPartition testé et oké
 
+SampledChord renvoyait une liste SANS nil
+	fun {Recursive N}% creer la tableau d'echantillions	 
+		  if N < Samp then 
+		     {SumSinus F N}/{Int.toFloat {List.length F}}|{Recursive N+1}
+		  else
+	   ---->     nil % au lieu de {SumSinus F N+1}/{Int.toFloat {List.length F}}
+		  end
+	       end
+Sumsinus faisait sin(..)/44100 au lieu de sin(.../44100)
 
 
 
