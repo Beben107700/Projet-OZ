@@ -713,7 +713,7 @@ local
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'Test.dj.oz'}
+   Music = {Project.load 'joy.dj.oz'}
    Start
 
    % Uncomment next line to insert your tests.
@@ -732,6 +732,7 @@ in
    % Calls your code, prints the result and outputs the result to `out.wav`.
    % You don't need to modify this.
    {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
+   %{Browse {Project.run Mix PartitionToTimedList [partition([a stretch(factor:1.0 [a b])])] 'out.wav'}}
    %{Browse {Mix PartitionToTimedList Music}}
    {Browse @C}
    %{Browse {IsPartition}}
