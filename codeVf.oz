@@ -578,8 +578,8 @@ local
 		  
 		  local  F A H Samp Recursive in
 		     H = {Int.toFloat {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}}} % on fixe le La comme 0 (reference)
-		     F = {Pow 2.0 H/12.0}
-		     Samp = {Float.toInt 44100.0*ExtNote.duration}%BENDELCOIGNE
+		     F = {Pow 2.0 H/12.0}*440.0
+		     Samp = {Float.toInt 44100.0*ExtNote.duration}
 
 		     fun {Recursive N}
 			if N =< Samp-1 then
@@ -599,7 +599,7 @@ local
 		     fun {Frequences EChord}      % renvoie une liste avec les frequence de chaque note de l'accord
 			case EChord of nil then nil
 			[] S|T then
-			   {Pow 2.0 {Int.toFloat {GetNumber S}-{GetNumber {NoteToExtended a4}}}/12.0}|{Frequences T} %{Int.toFloat {GetNumber S}-{GetNumber {NoteToExtended a4}}}/12.0}|{Frequences T}
+			   {Pow 2.0 {Int.toFloat {GetNumber S}-{GetNumber {NoteToExtended a4}}}/12.0}*440.0|{Frequences T} %{Int.toFloat {GetNumber S}-{GetNumber {NoteToExtended a4}}}/12.0}|{Frequences T}
 			end
 		     end
 
@@ -713,7 +713,7 @@ local
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'joy.dj.oz'}
+   Music = {Project.load 'Test.dj.oz'}
    Start
 
    % Uncomment next line to insert your tests.

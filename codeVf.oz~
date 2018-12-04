@@ -579,7 +579,7 @@ local
 		  local  F A H Samp Recursive in
 		     H = {Int.toFloat {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}}} % on fixe le La comme 0 (reference)
 		     F = {Pow 2.0 H/12.0}
-		     Samp = {Float.toInt 44100.0*ExtNote.duration}
+		     Samp = {Float.toInt 44100.0*ExtNote.duration}%BENDELCOIGNE
 
 		     fun {Recursive N}
 			if N =< Samp-1 then
@@ -623,9 +623,9 @@ local
 	       fun {Parcours EPart}
 		  case EPart of nil then nil
 		  []H|T then
-		     if {IsExtNote H} then {SampledNote H}|{Parcours T}
+		     if {IsExtNote H} then {Append {SampledNote H} {Parcours T}}
 		     else
-			{SampledChord H}|{Parcours T}
+			{Append {SampledChord H} {Parcours T}}
 		     end
 		  end
 	       end
@@ -732,6 +732,7 @@ in
    % Calls your code, prints the result and outputs the result to `out.wav`.
    % You don't need to modify this.
    {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
+   %{Browse {Mix PartitionToTimedList Music}}
    {Browse @C}
    %{Browse {IsPartition}}
 
