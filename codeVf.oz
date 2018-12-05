@@ -3,6 +3,7 @@ local
    [Project] = {Link ['Project2018.ozf']}
    Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
 
+   Lissage = true
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    fun{IsTrans X}
@@ -329,7 +330,7 @@ local
 
 
    fun {SampledWave Fname}
-      [1.0]
+      {Project.readFile Fname}
    end
    
 
@@ -610,7 +611,12 @@ local
 			   end
 			end
 			A = {Recursive 0}
-			A
+			if Lissage then
+			   {Fade 0.1 0.1 A}
+			else
+			   
+			   A
+			end
 		     end
 		  end
 	       end
@@ -647,11 +653,13 @@ local
 		  []H|T then
 		     if {IsExtNote H} then {Append {SampledNote H} {Parcours T}}
 		     else
-			 {Append {SampledChord H} {Parcours T}}
+			{Append {SampledChord H} {Parcours T}}
 		     end
 		  end
 	       end
-	       {Parcours ExtPart}   
+
+	       {Parcours ExtPart}
+
 	    end
 	 end
 	 
@@ -753,8 +761,8 @@ in
    
    % Calls your code, prints the result and outputs the result to `out.wav`.
    % You don't need to modify this.
+   {Browse {Project.run Mix PartitionToTimedList [wave('pig.wav')] 'out.wav'}}
    %{Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
-   {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
    %{Browse {Mix PartitionToTimedList Music}}
    {Browse @C}
    %{Browse {IsPartition}}
