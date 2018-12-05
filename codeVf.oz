@@ -577,21 +577,41 @@ local
 	    local SampledNote SampledChord ExtPart Parcours in
 	       ExtPart = {P2T Part} %%%%%%%%%%%%%%%%%%% L FAUT ABSOLUMENT METTRE P2T APRES
 	       fun {SampledNote ExtNote}
-		  
-		  local  F A H Samp Recursive in
-		     H = {Int.toFloat {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}}} % on fixe le La comme 0 (reference)
-		     F = {Pow 2.0 H/12.0}*440.0
-		     Samp = {Float.toInt 44100.0*ExtNote.duration}
 
-		     fun {Recursive N}
-			if N =< Samp-1 then
-			   0.5*{Sin 2.0*Pi*F*{Int.toFloat N}/44100.0}|{Recursive N+1}
-			else
-			   nil
+		  case ExtNote of
+		     silence(duration:D) then
+		     local Recursive Samp in
+			Samp = {Float.toInt 44100.0*ExtNote.duration}
+			fun {Recursive N}
+			   if N =< Samp-1 then
+			      0.0|{Recursive N+1}
+			   else
+			      nil
+			   end
 			end
+			{Recursive 0}
+			
+			
 		     end
-		     A = {Recursive 0}
-		     A
+		     
+		  else
+		     
+		     
+		     local  F A H Samp Recursive in
+			H = {Int.toFloat {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}}} % on fixe le La comme 0 (reference)
+			F = {Pow 2.0 H/12.0}*440.0
+			Samp = {Float.toInt 44100.0*ExtNote.duration}
+
+			fun {Recursive N}
+			   if N =< Samp-1 then
+			      0.5*{Sin 2.0*Pi*F*{Int.toFloat N}/44100.0}|{Recursive N+1}
+			   else
+			      nil
+			   end
+			end
+			A = {Recursive 0}
+			A
+		     end
 		  end
 	       end
 
@@ -715,7 +735,7 @@ local
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'Joy.dj.oz'}
+   Music = {Project.load 'joy.dj.oz'}
    Start
 
    % Uncomment next line to insert your tests.
@@ -734,8 +754,7 @@ in
    % Calls your code, prints the result and outputs the result to `out.wav`.
    % You don't need to modify this.
    %{Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
-   {Browse {Project.run Mix PartitionToTimedList [partition([a [stretch(factor:1.0 [a b])]])] 'out.wav'}}
-   %{Browse {PartitionToTimedList [a [stretch(factor:1.0 [a b])]] }}
+   {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
    %{Browse {Mix PartitionToTimedList Music}}
    {Browse @C}
    %{Browse {IsPartition}}
