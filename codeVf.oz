@@ -220,6 +220,7 @@ local
       [] H|T then
 	 if {IsExtNote H} then
 	    H|{ChordToExtended T}
+	 
 	 else
 	    {NoteToExtended H}|{ChordToExtended T}
 	 end
@@ -576,21 +577,42 @@ local
 	       ExtPart = {P2T Part} %%%%%%%%%%%%%%%%%%% L FAUT ABSOLUMENT METTRE P2T APRES
 	       fun {SampledNote ExtNote}
 		  
-		  local  F A H Samp Recursive in
-		     H = {Int.toFloat {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}}} % on fixe le La comme 0 (reference)
-		     F = {Pow 2.0 H/12.0}*440.0
-		     Samp = {Float.toInt 44100.0*ExtNote.duration}
-
-		     fun {Recursive N}
-			if N =< Samp-1 then
-			   0.5*{Sin 2.0*Pi*F*{Int.toFloat N}/44100.0}|{Recursive N+1}
-			else
-			   nil
+		  case ExtNote of
+		     silence(duration:D) then%SI JAI UN SILENCE
+		     local Recursive Samp in
+			Samp = {Float.toInt 44100.0*D}
+			fun {Recursive N}
+			   if N =< Samp-1 then
+			      0.0|{Recursive N+1}
+			   else
+			      nil
+			   end
 			end
+			{Recursive 0}
 		     end
-		     A = {Recursive 0}
-		     A
+		     
+		  else
+
+		     
+		     local  F A H Samp Recursive in
+			H = {Int.toFloat {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}}} % on fixe le La comme 0 (reference)
+			F = {Pow 2.0 H/12.0}*440.0
+			Samp = {Float.toInt 44100.0*ExtNote.duration}
+
+			fun {Recursive N}
+			   if N =< Samp-1 then
+			      0.5*{Sin 2.0*Pi*F*{Int.toFloat N}/44100.0}|{Recursive N+1}
+			   else
+			      nil
+			   end
+			end
+			A = {Recursive 0}
+			A
+		     end
+
 		  end
+		  
+		  
 	       end
 
 	       fun {SampledChord ExtChord}
@@ -713,7 +735,7 @@ local
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'Test1.dj.oz'}
+   Music = {Project.load 'Firestone.dj.oz'}
    Start
 
    % Uncomment next line to insert your tests.
