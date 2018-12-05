@@ -3,7 +3,7 @@ local
    [Project] = {Link ['Project2018.ozf']}
    Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
 
-   Lissage = false
+   Lissage = true
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    fun{IsTrans X}
@@ -610,12 +610,14 @@ local
 			      nil
 			   end
 			end
+			
 			A = {Recursive 0}
+
 			if Lissage then
-			   thread {Fade 0.1 0.1 A} end
+			   thread {Fade 0.1 0.1 A}end
 			else
 			   
-			   A
+			A
 			end
 		     end
 		  end
@@ -653,7 +655,7 @@ local
 		  []H|T then
 		     if {IsExtNote H} then {Append {SampledNote H} {Parcours T}}
 		     else
-			{Append {SampledChord H} {Parcours T}}
+			{Append {SampledChord H}  {Parcours T}}
 		     end
 		  end
 	       end
@@ -723,7 +725,7 @@ local
 	       if {IsSamples H} then
 		  {List.append H.1 {SampledPart T}}
 	       elseif {IsPartition H} then
-		  {List.append {SampledPartition H.1} {SampledPart T}}
+		  {List.append {SampledPartition H.1}  {SampledPart T}}
 	       elseif {IsWave H} then
 		  {List.append {SampledWave H.1} {SampledPart T}}
 	       elseif {IsMerge H} then
