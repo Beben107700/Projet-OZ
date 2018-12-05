@@ -3,7 +3,7 @@ local
    [Project] = {Link ['Project2018.ozf']}
    Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
 
-   Lissage = true
+   Lissage = false
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    fun{IsTrans X}
@@ -612,7 +612,7 @@ local
 			end
 			A = {Recursive 0}
 			if Lissage then
-			   {Fade 0.1 0.1 A}
+			   thread {Fade 0.1 0.1 A} end
 			else
 			   
 			   A
@@ -761,8 +761,8 @@ in
    
    % Calls your code, prints the result and outputs the result to `out.wav`.
    % You don't need to modify this.
-   {Browse {Project.run Mix PartitionToTimedList [wave('pig.wav')] 'out.wav'}}
-   %{Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
+   %{Browse {Project.run Mix PartitionToTimedList [wave('pig.wav')] 'out.wav'}}
+   {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
    %{Browse {Mix PartitionToTimedList Music}}
    {Browse @C}
    %{Browse {IsPartition}}
