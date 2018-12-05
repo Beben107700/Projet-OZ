@@ -39,7 +39,7 @@ local
    fun{IsChord X} %ATTENTION SI IL RECOIT UNE PARTITION IL ENVOIE TRUE
       case X
       of H|T then
-	 if {IsNote H} then
+	 if {IsNote H} orelse {IsTrans H} then
 	    true
 	 else
 	    false
@@ -220,6 +220,8 @@ local
       [] H|T then
 	 if {IsExtNote H} then
 	    H|{ChordToExtended T}
+	 elseif{IsTrans H} then
+	    {Append {Transform H} {ChordToExtended T}}
 	 else
 	    {NoteToExtended H}|{ChordToExtended T}
 	 end
@@ -713,7 +715,7 @@ local
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'Test1.dj.oz'}
+   Music = {Project.load 'Joy.dj.oz'}
    Start
 
    % Uncomment next line to insert your tests.
@@ -731,8 +733,9 @@ in
    
    % Calls your code, prints the result and outputs the result to `out.wav`.
    % You don't need to modify this.
-   {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
-   %{Browse {Project.run Mix PartitionToTimedList [partition([a stretch(factor:1.0 [a b])])] 'out.wav'}}
+   %{Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
+   {Browse {Project.run Mix PartitionToTimedList [partition([a [stretch(factor:1.0 [a b])]])] 'out.wav'}}
+   %{Browse {PartitionToTimedList [a [stretch(factor:1.0 [a b])]] }}
    %{Browse {Mix PartitionToTimedList Music}}
    {Browse @C}
    %{Browse {IsPartition}}
