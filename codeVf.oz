@@ -389,16 +389,10 @@ local
    end
    
 
-%%%MERGE
-
-%Je vais faire 3 fonctions:
-%Une qui se charge d'additionner deux listes deux à deux avec un facteur d'intensité
-%Une autre qui se charge de normaliser une liste entre -1 et 1
-%Enfin, une dernière qui se charge de merger le tout
-
-%%%%%%%%%%%SumList
-%INPUT: L1 I1 L2 I2 --> listes associees a une intensite. I1 et I2 sont entre 0 et 1
-%OUTPUT: Leur somme ponderee
+%---------------------------------------------------
+% SumList
+% INPUT L1 I1 L2 I2 --> listes associees a une intensite. I1 et I2 sont entre 0 et 1
+% OUTPUT Leur somme ponderee
    fun{SumList L1 I1 L2 I2}
       local Recurs in
 	 
@@ -432,10 +426,11 @@ local
    end
 %{Browse {SumList [1.0 1.0 1.0 1.0 1.0 2.0] 2.0 [2.0 2.0 2.0 2.0] 1.0}}
 
-   %%NORMALIZE
-%INPUT: Liste avec elements
-%OUTPUT: tous ces elements seront graduellement mis entre -1 et 1
 
+%---------------------------------------------------
+% NORMALIZE
+% INPUT Liste avec elements
+% OUTPUT tous ces elements seront graduellement mis entre -1 et 1
    fun{Normaliser Liste}
       local FindHigh Smallest Largest Divide FACTOR in
 	 
@@ -487,10 +482,10 @@ local
 
 %----------------------ZONE DES FILTRES----------------------------
 
-%%%%%%%%%%%%%REPEAT
-%%%%%%%INPUT:  N (entier) et Music [liste]
-%%%%%%%OUTPUT: [Liste]|[Liste] n fois
-
+%---------------------------------------------------
+% REPEAT
+% INPUT  N (entier) et Music [liste]
+% OUTPUT [Liste]|[Liste] n fois
    fun{Repeat Natural Music}
       local For in
 	 fun{For N}
@@ -504,10 +499,12 @@ local
       end
    end
 
-%%%%%%%%%%%%%CLIP
-%%%%%%%INPUT:  Low (float) High(float) Music([lsite])
-%%%%%%%OUTPUT: Music[Liste] ! borné entre low et high
 
+
+%---------------------------------------------------
+% CLIP
+% INPUT Low (float) High(float) Music([lsite])
+% OUTPUT Music[Liste] ! borné entre low et high
    fun{Clip Low High Music}
       local Recurs in
 	 fun{Recurs Liste}
@@ -526,16 +523,13 @@ local
    end
    %{Browse {Clip ~1.0 1.0 [1.0 2.0 0.64 38.2 ~22.0]}}
 
-%%%%%%%%%%%%%Echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   Necessite MERGE
-%%%%%%%INPUT:  Delay (fl) Delay (fl) MUsic(list)
-%%%%%%%OUTPUT: Music(list) avec un echo
 
    
 
-%%%%%%%%%%%%%LOOP
-%%%%%%%INPUT:  Duree (fl) Music(list)
-%%%%%%%OUTPUT: Liste de 44100*duree(secondes) echantillons de la musique. Si arrivé à la fin alors on reprend la chanson du début
-
+%---------------------------------------------------
+% LOOP
+% INPUT Duree (fl) Music(list)
+% OUTPUT Liste de 44100*duree(secondes) echantillons de la musique. Si arrivé à la fin alors on reprend la chanson du début
    fun{Loop Duree Music}
       local Recursion NombreTotalSample in
 	 NombreTotalSample = {Float.toInt Duree*44100.0}
@@ -554,18 +548,20 @@ local
       end
    end
 
-%%%%%%%%%%%%%REVERSE
-%%%%%%%INPUT:  Music sous forme a1|a2|a3|nil a appartient ai[-1;1]
-%%%%%%%OUTPUT: a3|a2|a1|nil
 
+%---------------------------------------------------
+% REVERSE
+% INPUT Music sous forme a1|a2|a3|nil a appartient ai[-1;1]
+% OUTPUT a3|a2|a1|nil
    fun{Reverse Music}
       {List.reverse Music $}
    end
 
-%%%%%%%%%%%%%FADE
-%%%%%%%INPUT:  Music
-%%%%%%%OUTPUT: Music (on incr et decr l'intensite)
 
+%---------------------------------------------------
+% FADE
+% INPUT Music
+% OUTPUT Music (on incr et decr l'intensite)
    fun{Fade Start Out Music}
       local StartEch OutEch Increment A1 A2 A3 in
 	 StartEch = {Float.toInt Start*44100.0}
