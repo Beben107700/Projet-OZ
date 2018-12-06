@@ -157,8 +157,6 @@ local
 	    of H|T then
 	       case H
 	       of silence(duration:A) then silence(duration:A)|{Recurs T}
-	       []U|F then
-		  {Transpose Semiton H}|{Recurs T}
 	       else {GetNote {GetNumber H}+Semiton}|{Recurs T}
 	       end
 	    []nil then nil
@@ -370,19 +368,22 @@ local
 
 %---------------------- ZONE DES SAMPLED-------------------
 
-%---------------------------------------------------
-% SampledWave
-% INPUT Nom de fichier
-% OUTPUT Liste de sample
+
    fun {SampledWave Fname}
       {Project.readFile Fname}
    end
    
 
-%---------------------------------------------------
-% SumList
-% INPUT  L1 I1 L2 I2 --> listes associees a une intensite. I1 et I2 sont entre 0 et 1
-% OUTPUT Leur somme ponderee élément par élémént
+%%%MERGE
+
+%Je vais faire 3 fonctions:
+%Une qui se charge d'additionner deux listes deux à deux avec un facteur d'intensité
+%Une autre qui se charge de normaliser une liste entre -1 et 1
+%Enfin, une dernière qui se charge de merger le tout
+
+%%%%%%%%%%%SumList
+%INPUT: L1 I1 L2 I2 --> listes associees a une intensite. I1 et I2 sont entre 0 et 1
+%OUTPUT: Leur somme ponderee
    fun{SumList L1 I1 L2 I2}
       local Recurs in
 	 
@@ -416,14 +417,10 @@ local
    end
 %{Browse {SumList [1.0 1.0 1.0 1.0 1.0 2.0] 2.0 [2.0 2.0 2.0 2.0] 1.0}}
 
-
    %%NORMALIZE
 %INPUT: Liste avec elements
 %OUTPUT: tous ces elements seront graduellement mis entre -1 et 1
-%---------------------------------------------------
-% Normalize
-% INPUT Liste avec elements
-% OUTPUT tous ces elements seront graduellement bornés entre -1 et 1
+
    fun{Normaliser Liste}
       local FindHigh Smallest Largest Divide FACTOR in
 	 
@@ -445,6 +442,7 @@ local
 	    end
 	    
 	 end
+
 	 fun{Divide L Facteur}
 	    case L
 	    of nil then nil
@@ -478,11 +476,6 @@ local
 %%%%%%%INPUT:  N (entier) et Music [liste]
 %%%%%%%OUTPUT: [Liste]|[Liste] n fois
 
-%---------------------------------------------------
-% Repeat
-% INPUT N et Music
-% OUTPUT [Liste] |  Liste | Liste n fois
-
    fun{Repeat Natural Music}
       local For in
 	 fun{For N}
@@ -500,10 +493,6 @@ local
 %%%%%%%INPUT:  Low (float) High(float) Music([lsite])
 %%%%%%%OUTPUT: Music[Liste] ! borné entre low et high
 
-%---------------------------------------------------
-% Clip
-% INPUT Low (float) High(float) Music([lsite])
-% OUTPUT Music[Liste] ! borné entre low et high
    fun{Clip Low High Music}
       local Recurs in
 	 fun{Recurs Liste}
@@ -522,14 +511,15 @@ local
    end
    %{Browse {Clip ~1.0 1.0 [1.0 2.0 0.64 38.2 ~22.0]}}
 
-
+%%%%%%%%%%%%%Echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   Necessite MERGE
+%%%%%%%INPUT:  Delay (fl) Delay (fl) MUsic(list)
+%%%%%%%OUTPUT: Music(list) avec un echo
 
    
 
-%---------------------------------------------------
-% LOOP
-% INPUT Duree (fl) Music(list)
-% OUTPUT Liste de 44100*duree(secondes) echantillons de la musique. Si arrivé à la fin alors on reprend la chanson du début
+%%%%%%%%%%%%%LOOP
+%%%%%%%INPUT:  Duree (fl) Music(list)
+%%%%%%%OUTPUT: Liste de 44100*duree(secondes) echantillons de la musique. Si arrivé à la fin alors on reprend la chanson du début
 
    fun{Loop Duree Music}
       local Recursion NombreTotalSample in
@@ -549,12 +539,9 @@ local
       end
    end
 
-
-
-%---------------------------------------------------
-% REVERSE
-% INPUT Music sous forme a1|a2|a3|nil a appartient ai[-1;1]
-% OUTPUT a3|a2|a1|nil
+%%%%%%%%%%%%%REVERSE
+%%%%%%%INPUT:  Music sous forme a1|a2|a3|nil a appartient ai[-1;1]
+%%%%%%%OUTPUT: a3|a2|a1|nil
 
    fun{Reverse Music}
       {List.reverse Music $}
@@ -564,10 +551,6 @@ local
 %%%%%%%INPUT:  Music
 %%%%%%%OUTPUT: Music (on incr et decr l'intensite)
 
-%---------------------------------------------------
-%  Fade
-% INPUT Music
-% OUTPUT Music (on incr et decr l'intensite)
    fun{Fade Start Out Music}
       local StartEch OutEch Increment A1 A2 A3 in
 	 StartEch = {Float.toInt Start*44100.0}
@@ -598,10 +581,7 @@ local
 %{Browse {Fade 4.0 4.0 [1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]}}
 %{Browse {Fade 4.0 4.0 [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]}} %TEST QUI N'IRA PAS PSQ ON A DES INT
 
-%---------------------------------------------------
-%  Cut
-% INPUT Start End Liste de samples
-% OUTPUT La liste coupée entre start et end. Si end>la duree de la musique on met des silences
+
    fun{Cut Start Finish Music}
       local Nstart Nstop Recursion in
 	 Nstart = {Float.toInt Start*44100.0}
@@ -633,11 +613,11 @@ local
 
 
 %-------------------END ZONE DES FILTRES--------------------------
+    C = {NewCell nil}
+
    Pi = 3.14159265359
-%---------------------------------------------------
-%  Mix
-% INPUT Part
-% OUTPUT liste de samples
+%--- INPUT: ​part
+%---OOUTPUT: samples
    fun {Mix P2T Music}
       
       local SampledPart Merge Echo SampledFilter SampledPartition in
@@ -802,9 +782,7 @@ local
 	       elseif {IsFilter H} then
 		  {List.append {SampledFilter H} {SampledPart T}}
 	       else
-		   local A in
-		    A = 0
-		   end
+		 C := H
 	       end    
 	    end	
 	 end
@@ -816,7 +794,7 @@ local
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'joy.dj.oz'}
+   Music = {Project.load 'TestFiltresMusique.dj.oz'}
    Start
 
    % Uncomment next line to insert your tests.
@@ -837,6 +815,8 @@ in
    %{Browse {Project.run Mix PartitionToTimedList [wave('pig.wav')] 'out.wav'}}
    {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
    %{Browse {Mix PartitionToTimedList Music}}
+   {Browse @C}
+   %{Browse {IsPartition}}
 
 
    

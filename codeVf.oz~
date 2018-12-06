@@ -2,14 +2,10 @@ local
    % See project statement for API details.
    [Project] = {Link ['Project2018.ozf']}
    Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
-   %----------------------------------------------------------------------------------------------------
-   %Activer ou désactiver le lissage
-   Lissage = false
-   %----------------------------------------------------------------------------------------------------
 
-   
-   %----------------------------------------------------------------------------------------------------
-   %IsTrans renvoie true si X est une transformation
+   Lissage = true
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
    fun{IsTrans X}
       if{Record.is X}then
 	 case X
@@ -22,16 +18,13 @@ local
       else false
       end
    end
-   %----------------------------------------------------------------------------------------------------
-   %IsNote renvoie true si X est une Note
+
    fun{IsNote X}
       if{Tuple.is X}then true
       elseif {Atom.is X}then true
       else false
       end
    end
-   %----------------------------------------------------------------------------------------------------
-   %IsExtNote renvoie true si X est une ExtendedNote
    fun{IsExtNote X}
       if{Record.is X} then
 	 case X
@@ -43,8 +36,7 @@ local
 	 false
       end  
    end
-   %----------------------------------------------------------------------------------------------------
-   %IsChord renvoie true si X est un accord
+
    fun{IsChord X} %ATTENTION SI IL RECOIT UNE PARTITION IL ENVOIE TRUE
       case X
       of H|T then
@@ -56,8 +48,7 @@ local
       else false
       end
    end
-   %----------------------------------------------------------------------------------------------------
-   %IsExtChord renvoie true si X est une Extended Chord
+
    fun{IsExtChord X} 
       case X %C'est ok selon l'enonce
       of H|T then
@@ -71,9 +62,7 @@ local
    end
 
 %---------------------ZONE DES TRANSFORMATIONS ----------------------
-%Ici nous écrivons toutes les transformations possibles sur une partition
-%---------------------------------------------------
-   %Transform dispatche les transformations vers leur sous fonction
+
    fun{Transform X}
       case X
       of duration(seconds:S B) then {Duration S B}%appel a la fct duration
@@ -84,10 +73,6 @@ local
       end
    end
 
-%---------------------------------------------------
-% Stretch
-% INPUT Fact , un facteur et Part, une partition (extpart ou non)
-% OUTPUT Chaque durée de note multipliée par le facteur
    fun{Stretch Fact Part}   
       local StretchExt in
 	 fun {StretchExt Fact EPart}
@@ -107,10 +92,7 @@ local
 	 {StretchExt Fact {PartitionToTimedList Part}}
       end%fin du local
    end   
-%---------------------------------------------------
-% GetDuration
-% INPUT Partition
-% OUTPUT Durée(secondes) de la partition
+
    fun {GetDuration List}
       local Accumulateur in
 	 fun{Accumulateur Acc Reste}
@@ -121,10 +103,7 @@ local
 	 {Accumulateur 0.0 {PartitionToTimedList List}}
       end
    end
-%---------------------------------------------------
-% Duration
-% INPUT Duree & Partition
-% OUTPUT Chaque durée de note modifiée pour que la partition soit de durée donnée
+
    fun {Duration Sec Part}
       local Fact in
 	 Fact = Sec / {GetDuration Part} %doit rendre un float!
@@ -146,10 +125,7 @@ local
 	 {Recurs 1}
       end%local
    end
-%---------------------------------------------------
-% Transpose
-% INPUT Partition, semiton
-% OUTPUT Partition, chaque note est transposée d'un nombre de semitons donné
+
    fun{Transpose Semiton Part} %Souci si j'ai un silence dans ma part.
       local Recurs in
 	 fun{Recurs Reste}
@@ -165,10 +141,7 @@ local
 	 {Recurs {PartitionToTimedList Part}}
       end%local
    end%fct
-%---------------------------------------------------
-% GetNumber
-% INPUT ExtendedNote
-% OUTPUT renvoie l'indice de la note dans notre système de classification
+
    fun {GetNumber ExtNote}
       case ExtNote.name of 'c' then 
 	 if ExtNote.sharp then 2+ 12*(ExtNote.octave-1) % do#
@@ -196,10 +169,7 @@ local
 	 12 + 12*(ExtNote.octave -1 ) %si
       end
    end
-%---------------------------------------------------
-% GetNote
-% INPUT Nombre entier
-% OUTPUT Renvoie la note associée (inverse de GetNumber)
+
    fun {GetNote I}
       local Tab Oct N IsSharp in
 	 fun{IsSharp U}
@@ -222,10 +192,7 @@ local
 
 %----------------------END ZONE DES TRANSFORMATIONS-------------------
 
-%---------------------------------------------------
-% NoteToExtended
-% INPUT Note
-% OUTPUT ExtNote
+   % Translate a note to the extended notation.
    fun{NoteToExtended Note}
       case Note
       of Name#Octave then
@@ -246,11 +213,8 @@ local
 	 
       end
    end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%---------------------------------------------------
-% ChordToExtended
-% INPUT Chord
-% OUTPUT ExtChord
    fun {ChordToExtended Chord}
       case Chord
       of nil then nil
@@ -265,10 +229,6 @@ local
 	 
       end
    end
-%---------------------------------------------------
-% PartitionToTimedList
-% INPUT Partition
-% OUTPUT Liste de ExtendedNote et ExtendedChord
 
    fun {PartitionToTimedList Partition}
       %NB: Partition est une liste [a1 a2 a3 a4]
@@ -368,19 +328,22 @@ local
 
 %---------------------- ZONE DES SAMPLED-------------------
 
-%---------------------------------------------------
-% SampledWave
-% INPUT Nom de fichier
-% OUTPUT Liste de sample
+
    fun {SampledWave Fname}
       {Project.readFile Fname}
    end
    
 
-%---------------------------------------------------
-% SumList
-% INPUT  L1 I1 L2 I2 --> listes associees a une intensite. I1 et I2 sont entre 0 et 1
-% OUTPUT Leur somme ponderee élément par élémént
+%%%MERGE
+
+%Je vais faire 3 fonctions:
+%Une qui se charge d'additionner deux listes deux à deux avec un facteur d'intensité
+%Une autre qui se charge de normaliser une liste entre -1 et 1
+%Enfin, une dernière qui se charge de merger le tout
+
+%%%%%%%%%%%SumList
+%INPUT: L1 I1 L2 I2 --> listes associees a une intensite. I1 et I2 sont entre 0 et 1
+%OUTPUT: Leur somme ponderee
    fun{SumList L1 I1 L2 I2}
       local Recurs in
 	 
@@ -414,14 +377,10 @@ local
    end
 %{Browse {SumList [1.0 1.0 1.0 1.0 1.0 2.0] 2.0 [2.0 2.0 2.0 2.0] 1.0}}
 
-
    %%NORMALIZE
 %INPUT: Liste avec elements
 %OUTPUT: tous ces elements seront graduellement mis entre -1 et 1
-%---------------------------------------------------
-% Normalize
-% INPUT Liste avec elements
-% OUTPUT tous ces elements seront graduellement bornés entre -1 et 1
+
    fun{Normaliser Liste}
       local FindHigh Smallest Largest Divide FACTOR in
 	 
@@ -443,6 +402,7 @@ local
 	    end
 	    
 	 end
+
 	 fun{Divide L Facteur}
 	    case L
 	    of nil then nil
@@ -451,7 +411,7 @@ local
 	    end
 	    
 	 end
-	 FACTOR = {Number.abs {FindHigh Liste}}
+	 thread FACTOR = {Number.abs {FindHigh Liste}} end
 	 if FACTOR > 1.0 then
 	    {Divide Liste FACTOR} %Fait Divide avec la Liste; {FindHigh Liste} permet de trouver par quel facteur il faut diviser
 	 else
@@ -476,11 +436,6 @@ local
 %%%%%%%INPUT:  N (entier) et Music [liste]
 %%%%%%%OUTPUT: [Liste]|[Liste] n fois
 
-%---------------------------------------------------
-% Repeat
-% INPUT N et Music
-% OUTPUT [Liste] |  Liste | Liste n fois
-
    fun{Repeat Natural Music}
       local For in
 	 fun{For N}
@@ -498,10 +453,6 @@ local
 %%%%%%%INPUT:  Low (float) High(float) Music([lsite])
 %%%%%%%OUTPUT: Music[Liste] ! borné entre low et high
 
-%---------------------------------------------------
-% Clip
-% INPUT Low (float) High(float) Music([lsite])
-% OUTPUT Music[Liste] ! borné entre low et high
    fun{Clip Low High Music}
       local Recurs in
 	 fun{Recurs Liste}
@@ -520,14 +471,15 @@ local
    end
    %{Browse {Clip ~1.0 1.0 [1.0 2.0 0.64 38.2 ~22.0]}}
 
-
+%%%%%%%%%%%%%Echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   Necessite MERGE
+%%%%%%%INPUT:  Delay (fl) Delay (fl) MUsic(list)
+%%%%%%%OUTPUT: Music(list) avec un echo
 
    
 
-%---------------------------------------------------
-% LOOP
-% INPUT Duree (fl) Music(list)
-% OUTPUT Liste de 44100*duree(secondes) echantillons de la musique. Si arrivé à la fin alors on reprend la chanson du début
+%%%%%%%%%%%%%LOOP
+%%%%%%%INPUT:  Duree (fl) Music(list)
+%%%%%%%OUTPUT: Liste de 44100*duree(secondes) echantillons de la musique. Si arrivé à la fin alors on reprend la chanson du début
 
    fun{Loop Duree Music}
       local Recursion NombreTotalSample in
@@ -547,12 +499,9 @@ local
       end
    end
 
-
-
-%---------------------------------------------------
-% REVERSE
-% INPUT Music sous forme a1|a2|a3|nil a appartient ai[-1;1]
-% OUTPUT a3|a2|a1|nil
+%%%%%%%%%%%%%REVERSE
+%%%%%%%INPUT:  Music sous forme a1|a2|a3|nil a appartient ai[-1;1]
+%%%%%%%OUTPUT: a3|a2|a1|nil
 
    fun{Reverse Music}
       {List.reverse Music $}
@@ -562,10 +511,6 @@ local
 %%%%%%%INPUT:  Music
 %%%%%%%OUTPUT: Music (on incr et decr l'intensite)
 
-%---------------------------------------------------
-%  Fade
-% INPUT Music
-% OUTPUT Music (on incr et decr l'intensite)
    fun{Fade Start Out Music}
       local StartEch OutEch Increment A1 A2 A3 in
 	 StartEch = {Float.toInt Start*44100.0}
@@ -596,10 +541,7 @@ local
 %{Browse {Fade 4.0 4.0 [1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]}}
 %{Browse {Fade 4.0 4.0 [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]}} %TEST QUI N'IRA PAS PSQ ON A DES INT
 
-%---------------------------------------------------
-%  Cut
-% INPUT Start End Liste de samples
-% OUTPUT La liste coupée entre start et end. Si end>la duree de la musique on met des silences
+
    fun{Cut Start Finish Music}
       local Nstart Nstop Recursion in
 	 Nstart = {Float.toInt Start*44100.0}
@@ -613,12 +555,15 @@ local
 		  else
 		     H|{Recursion N+1 T}
 		  end
-	       [] nil then
-		  0.0|{Recursion N+1 nil}
 	       end
 	       
 	    else
-	       nil
+	       case Liste of
+		  H|T then
+		  0.0|{Recursion N+1 T}
+	       else
+		  nil
+	       end
 	       
 	    end
 	    
@@ -631,11 +576,11 @@ local
 
 
 %-------------------END ZONE DES FILTRES--------------------------
+    C = {NewCell nil}
+
    Pi = 3.14159265359
-%---------------------------------------------------
-%  Mix
-% INPUT Part
-% OUTPUT liste de samples
+%--- INPUT: ​part
+%---OOUTPUT: samples
    fun {Mix P2T Music}
       
       local SampledPart Merge Echo SampledFilter SampledPartition in
@@ -681,7 +626,7 @@ local
 			A = {Recursive 0}
 
 			if Lissage then
-			   {Fade 0.1 0.1 A}
+			   thread {Fade 0.1 0.1 A}end
 			else
 			   
 			A
@@ -771,14 +716,14 @@ local
 	       SamplesToSilence = {Float.toInt Delay*44100.0}
 	       fun {SilenceList N}%finit par a|a et pas a|a|nil
 		  if N < SamplesToSilence then
-		     0.0|{SilenceList N+1}
+		     N|{SilenceList N+1}
 		  else %n == amount
-		     0.0|nil
+		     N
 		  end
 	       end
-	       SonAvecEcho = {Append {SilenceList 1} Music}
+	       SonAvecEcho = {SilenceList 1 }|Music
       %Je dois rendre un MERGE(1.0#Music Decay#SonAvecEcho)
-	       {Merge [1.0#[samples(Music)] Decay#[samples(SonAvecEcho)] ]}
+	       {Merge [1.0#Music Decay#SonAvecEcho]}
       %{SilenceList 1}|nil
 	    end
 	 end
@@ -800,9 +745,7 @@ local
 	       elseif {IsFilter H} then
 		  {List.append {SampledFilter H} {SampledPart T}}
 	       else
-		   local A in
-		    A = 0
-		   end
+		 C := H
 	       end    
 	    end	
 	 end
@@ -814,7 +757,7 @@ local
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'joy.dj.oz'}
+   Music = {Project.load 'example.dj.oz'}
    Start
 
    % Uncomment next line to insert your tests.
@@ -835,6 +778,7 @@ in
    %{Browse {Project.run Mix PartitionToTimedList [wave('pig.wav')] 'out.wav'}}
    {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
    %{Browse {Mix PartitionToTimedList Music}}
+   {Browse @C}
    %{Browse {IsPartition}}
 
 
