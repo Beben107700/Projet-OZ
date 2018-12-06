@@ -1,6 +1,6 @@
 %AUTEURS - Projet 2018-2019 Informatique
 %BEN DELCOIGNE 3877 1700 
-£MIGUEL LETOR 4941 1700
+%MIGUEL LETOR 4941 1700
 local
    % See project statement for API details.
    [Project] = {Link ['Project2018.ozf']}
@@ -84,7 +84,7 @@ local
 
 %AUTEURS - Projet 2018-2019 Informatique
 %BEN DELCOIGNE 3877 1700 
-£MIGUEL LETOR 4941 1700
+%MIGUEL LETOR 4941 1700
 %---------------------ZONE DES TRANSFORMATIONS ----------------------
 %Ici nous écrivons toutes les transformations possibles sur une partition
 %---------------------------------------------------
@@ -163,7 +163,7 @@ local
    end
 %AUTEURS - Projet 2018-2019 Informatique
 %BEN DELCOIGNE 3877 1700 
-£MIGUEL LETOR 4941 1700
+%MIGUEL LETOR 4941 1700
 %---------------------------------------------------
 % Transpose
 % INPUT Partition, semiton
@@ -243,7 +243,7 @@ local
 %----------------------END ZONE DES TRANSFORMATIONS-------------------
 %AUTEURS - Projet 2018-2019 Informatique
 %BEN DELCOIGNE 3877 1700 
-£MIGUEL LETOR 4941 1700
+%MIGUEL LETOR 4941 1700
 
 %---------------------------------------------------
 % NoteToExtended
@@ -329,7 +329,7 @@ local
 
 %AUTEURS - Projet 2018-2019 Informatique
 %BEN DELCOIGNE 3877 1700 
-£MIGUEL LETOR 4941 1700
+%MIGUEL LETOR 4941 1700
 %---------------------- ZONE DES IS-------------------
 
    fun {IsSamples Part}
@@ -442,7 +442,7 @@ local
 
 %AUTEURS - Projet 2018-2019 Informatique
 %BEN DELCOIGNE 3877 1700 
-£MIGUEL LETOR 4941 1700
+%MIGUEL LETOR 4941 1700
 %---------------------------------------------------
 % NORMALIZE
 % INPUT Liste avec elements
@@ -575,7 +575,7 @@ local
 
 %AUTEURS - Projet 2018-2019 Informatique
 %BEN DELCOIGNE 3877 1700 
-£MIGUEL LETOR 4941 1700
+%MIGUEL LETOR 4941 1700
 %---------------------------------------------------
 % FADE
 % INPUT Music
@@ -822,7 +822,7 @@ local
 
 %AUTEURS - Projet 2018-2019 Informatique
 %BEN DELCOIGNE 3877 1700 
-£MIGUEL LETOR 4941 1700
+%MIGUEL LETOR 4941 1700
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    Music = {Project.load 'example.dj.oz'}

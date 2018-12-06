@@ -1,9 +1,9 @@
 %AUTEURS - Projet 2018-2019 Informatique
 %BEN DELCOIGNE 3877 1700 
-£MIGUEL LETOR 4941 1700
+%MIGUEL LETOR 4941 1700
 %Still by DRe
 local
-   T1 = [c5 d5 f5 []]
+   T1 = [c5 d5 f5]
    T2 = [stretch(factor:0.7 [c5 d5 f5])]
    T3 = [stretch(factor:0.3 [c5 d5 f5])]
    Chord1 = [[stretch(factor:0.4 [c5 d5 f5])]]

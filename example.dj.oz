@@ -1,6 +1,6 @@
 %AUTEURS - Projet 2018-2019 Informatique
 %BEN DELCOIGNE 3877 1700 
-£MIGUEL LETOR 4941 1700
+%MIGUEL LETOR 4941 1700
 local
   
    Music1 = [partition([a b c d [d f b]])]
