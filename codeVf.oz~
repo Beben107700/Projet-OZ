@@ -3,6 +3,7 @@ local
    [Project] = {Link ['Project2018.ozf']}
    Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
 
+   Lissage = true
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    fun{IsTrans X}
@@ -39,7 +40,7 @@ local
    fun{IsChord X} %ATTENTION SI IL RECOIT UNE PARTITION IL ENVOIE TRUE
       case X
       of H|T then
-	 if {IsNote H} then
+	 if {IsNote H} orelse {IsTrans H} then
 	    true
 	 else
 	    false
@@ -220,6 +221,8 @@ local
       [] H|T then
 	 if {IsExtNote H} then
 	    H|{ChordToExtended T}
+	 elseif{IsTrans H} then
+	    {Append {Transform H} {ChordToExtended T}}
 	 else
 	    {NoteToExtended H}|{ChordToExtended T}
 	 end
@@ -327,7 +330,7 @@ local
 
 
    fun {SampledWave Fname}
-      [1.0]
+      {Project.readFile Fname}
    end
    
 
@@ -575,21 +578,48 @@ local
 	    local SampledNote SampledChord ExtPart Parcours in
 	       ExtPart = {P2T Part} %%%%%%%%%%%%%%%%%%% L FAUT ABSOLUMENT METTRE P2T APRES
 	       fun {SampledNote ExtNote}
-		  
-		  local  F A H Samp Recursive in
-		     H = {Int.toFloat {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}}} % on fixe le La comme 0 (reference)
-		     F = {Pow 2.0 H/12.0}*440.0
-		     Samp = {Float.toInt 44100.0*ExtNote.duration}
 
-		     fun {Recursive N}
-			if N =< Samp-1 then
-			   0.5*{Sin 2.0*Pi*F*{Int.toFloat N}/44100.0}|{Recursive N+1}
+		  case ExtNote of
+		     silence(duration:D) then
+		     local Recursive Samp in
+			Samp = {Float.toInt 44100.0*ExtNote.duration}
+			fun {Recursive N}
+			   if N =< Samp-1 then
+			      0.0|{Recursive N+1}
+			   else
+			      nil
+			   end
+			end
+			{Recursive 0}
+			
+			
+		     end
+		     
+		  else
+		     
+		     
+		     local  F A H Samp Recursive in
+			H = {Int.toFloat {GetNumber ExtNote} - {GetNumber {NoteToExtended a4}}} % on fixe le La comme 0 (reference)
+			F = {Pow 2.0 H/12.0}*440.0
+			Samp = {Float.toInt 44100.0*ExtNote.duration}
+
+			fun {Recursive N}
+			   if N =< Samp-1 then
+			      0.5*{Sin 2.0*Pi*F*{Int.toFloat N}/44100.0}|{Recursive N+1}
+			   else
+			      nil
+			   end
+			end
+			
+			A = {Recursive 0}
+
+			if Lissage then
+			   thread {Fade 0.1 0.1 A}end
 			else
-			   nil
+			   
+			A
 			end
 		     end
-		     A = {Recursive 0}
-		     A
 		  end
 	       end
 
@@ -625,11 +655,13 @@ local
 		  []H|T then
 		     if {IsExtNote H} then {Append {SampledNote H} {Parcours T}}
 		     else
-			 {Append {SampledChord H} {Parcours T}}
+			{Append {SampledChord H}  {Parcours T}}
 		     end
 		  end
 	       end
-	       {Parcours ExtPart}   
+
+	       {Parcours ExtPart}
+
 	    end
 	 end
 	 
@@ -693,7 +725,7 @@ local
 	       if {IsSamples H} then
 		  {List.append H.1 {SampledPart T}}
 	       elseif {IsPartition H} then
-		  {List.append {SampledPartition H.1} {SampledPart T}}
+		  {List.append {SampledPartition H.1}  {SampledPart T}}
 	       elseif {IsWave H} then
 		  {List.append {SampledWave H.1} {SampledPart T}}
 	       elseif {IsMerge H} then
@@ -713,7 +745,7 @@ local
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'Test1.dj.oz'}
+   Music = {Project.load 'joy.dj.oz'}
    Start
 
    % Uncomment next line to insert your tests.
@@ -731,8 +763,8 @@ in
    
    % Calls your code, prints the result and outputs the result to `out.wav`.
    % You don't need to modify this.
+   %{Browse {Project.run Mix PartitionToTimedList [wave('pig.wav')] 'out.wav'}}
    {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
-   %{Browse {Project.run Mix PartitionToTimedList [partition([a stretch(factor:1.0 [a b])])] 'out.wav'}}
    %{Browse {Mix PartitionToTimedList Music}}
    {Browse @C}
    %{Browse {IsPartition}}
