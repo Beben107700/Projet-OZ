@@ -555,15 +555,12 @@ local
 		  else
 		     H|{Recursion N+1 T}
 		  end
+	       [] nil then
+		  0.0|{Recursion N+1 nil}
 	       end
 	       
 	    else
-	       case Liste of
-		  H|T then
-		  0.0|{Recursion N+1 T}
-	       else
-		  nil
-	       end
+	       nil
 	       
 	    end
 	    
@@ -716,14 +713,14 @@ local
 	       SamplesToSilence = {Float.toInt Delay*44100.0}
 	       fun {SilenceList N}%finit par a|a et pas a|a|nil
 		  if N < SamplesToSilence then
-		     N|{SilenceList N+1}
+		     0.0|{SilenceList N+1}
 		  else %n == amount
-		     N
+		     0.0|nil
 		  end
 	       end
-	       SonAvecEcho = {SilenceList 1 }|Music
+	       SonAvecEcho = {Append {SilenceList 1} Music}
       %Je dois rendre un MERGE(1.0#Music Decay#SonAvecEcho)
-	       {Merge [1.0#Music Decay#SonAvecEcho]}
+	       {Merge [1.0#[samples(Music)] Decay#[samples(SonAvecEcho)] ]}
       %{SilenceList 1}|nil
 	    end
 	 end
@@ -757,7 +754,7 @@ local
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'example.dj.oz'}
+   Music = {Project.load 'TestFiltresMusique.dj.oz'}
    Start
 
    % Uncomment next line to insert your tests.
