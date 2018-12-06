@@ -30,9 +30,17 @@ local
       else false
       end
    end
+      %----------------------------------------------------------------------------------------------------
+   %IsEmptyChord renvoie true si X est un accord vide
+   fun{IsEmptyChord X}
+      case X of
+	 [_] then true
+      else false
+      end
+   end
    %----------------------------------------------------------------------------------------------------
    %IsExtNote renvoie true si X est une ExtendedNote
-   fun{IsExtNote X}
+      fun{IsExtNote X}
       if{Record.is X} then
 	 case X
 	 of note(name:A octave:B sharp:C duration:D instrument:E) then true
@@ -289,6 +297,8 @@ local
 		  H|{ExtendedPart T}
 	       elseif {IsNote H} then
 		  {NoteToExtended H}|{ExtendedPart T}
+	       elseif {IsEmptyChord H} then
+		  {ExtendedPart T}
 	       else
 		  {Append {Transform H} {ExtendedPart T}}
 	       end    
