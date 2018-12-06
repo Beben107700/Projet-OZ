@@ -310,7 +310,7 @@ local
    end
    fun{IsFilter Filter}
       case Filter of nil then true
-      [] repeat(amout:I M) then true
+      [] repeat(amount:I M) then true
       [] loop(duration:D M) then true
       [] clip(low:S1 high:S2 M) then true
       [] echo(delay:D1 decay:D2 M) then true
@@ -441,6 +441,8 @@ local
 	 fun{For N}
 	    if N=<Natural then
 	       {Append Music {For N+1}}
+	    else
+	       nil
 	    end
 	 end
 	 {For 1}
@@ -549,12 +551,22 @@ local
 	       case Liste
 	       of H|T then
 		  if N<Nstart then
-		     0.0|{Recursion N+1 T}
+		     {Recursion N+1 T}
 		  else
 		     H|{Recursion N+1 T}
 		  end
 	       end
-	    else nil end
+	       
+	    else
+	       case Liste of
+		  H|T then
+		  0.0|{Recursion N+1 T}
+	       else
+		  nil
+	       end
+	       
+	    end
+	    
 	 end
 	 {Recursion 1 Music}
       end
@@ -687,7 +699,7 @@ local
 	 %3)
 	 fun {SampledFilter Filtre}
 	    case Filtre of nil then nil
-	    [] repeat(amout:I M) then {Repeat I {Mix P2T M}}
+	    [] repeat(amount:I M) then {Repeat I {Mix P2T M}}
 	    [] loop(duration:D M) then {Loop D {Mix P2T M}}
 	    [] clip(low:S1 high:S2 M) then {Clip S1 S2 {Mix P2T M}}
 	    [] echo(delay:D1 decay:D2 M) then {Echo D1 D2 {Mix P2T M}}
@@ -745,7 +757,7 @@ local
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'joy.dj.oz'}
+   Music = {Project.load 'example.dj.oz'}
    Start
 
    % Uncomment next line to insert your tests.

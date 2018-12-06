@@ -555,15 +555,12 @@ local
 		  else
 		     H|{Recursion N+1 T}
 		  end
+	       [] nil then
+		  0.0|{Recursion N+1 nil}
 	       end
 	       
 	    else
-	       case Liste of
-		  H|T then
-		  0.0|{Recursion N+1 T}
-	       else
-		  nil
-	       end
+	       nil
 	       
 	    end
 	    
@@ -757,7 +754,7 @@ local
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'example.dj.oz'}
+   Music = {Project.load 'TestFiltresMusique.dj.oz'}
    Start
 
    % Uncomment next line to insert your tests.
