@@ -157,6 +157,8 @@ local
 	    of H|T then
 	       case H
 	       of silence(duration:A) then silence(duration:A)|{Recurs T}
+	       []U|F then
+		  {Transpose Semiton U}|{Recurs T}
 	       else {GetNote {GetNumber H}+Semiton}|{Recurs T}
 	       end
 	    []nil then nil
