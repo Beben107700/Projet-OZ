@@ -25,7 +25,8 @@ local
    %----------------------------------------------------------------------------------------------------
    %IsNote renvoie true si X est une Note
    fun{IsNote X}
-      if{Tuple.is X}then true
+      if{Tuple.is X}then 
+	 if{List.is X} then false else true end
       elseif {Atom.is X}then true
       else false
       end
@@ -299,8 +300,10 @@ local
 		  {NoteToExtended H}|{ExtendedPart T}
 	       elseif {IsEmptyChord H} then
 		  {ExtendedPart T}
-	       else
+	       elseif {IsTrans H} then
 		  {Append {Transform H} {ExtendedPart T}}
+	       else
+		  {ExtendedPart T}
 	       end    
 	    end	
 	 end
@@ -806,7 +809,7 @@ local
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'TestFiltresMusique.dj.oz'}
+   Music = {Project.load 'example.dj.oz'}
    Start
 
    % Uncomment next line to insert your tests.
@@ -826,7 +829,7 @@ in
    % You don't need to modify this.
    %{Browse {Project.run Mix PartitionToTimedList [wave('pig.wav')] 'out.wav'}}
    {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
-   %{Browse {Mix PartitionToTimedList Music}}
+   %{Browse {PartitionToTimedList [a a a [_] a]}}
    {Browse @C}
    %{Browse {IsPartition}}
 
