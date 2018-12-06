@@ -1,4 +1,7 @@
-% Ode To Joy
+%AUTEURS - Projet 2018-2019 Informatique
+%BEN DELCOIGNE 3877 1700 
+£MIGUEL LETOR 4941 1700
+%Still by DRe
 local
    T1 = [c5 d5 f5 []]
    T2 = [stretch(factor:0.7 [c5 d5 f5])]
@@ -14,5 +17,5 @@ in
    % This is a music :)
    %[partition([a stretch(factor:1.0 [a b])])]
    
-   [repeat(amount:2 [partition(T1)]) repeat(amount:2 [partition(T2)]) repeat(amount:2 [partition(T3)]) loop(duration:5.0 L)]
+   [repeat(amount:2 [partition(T1)]) repeat(amount:2 [partition(T2)]) repeat(amount:2 [partition(T3)]) loop(duration:20.0 L)]
 end
