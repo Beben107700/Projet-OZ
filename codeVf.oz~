@@ -814,7 +814,7 @@ local
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   Music = {Project.load 'TestFiltresMusique.dj.oz'}
+   Music = {Project.load 'joy.dj.oz'}
    Start
 
    % Uncomment next line to insert your tests.

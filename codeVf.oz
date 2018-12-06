@@ -157,6 +157,8 @@ local
 	    of H|T then
 	       case H
 	       of silence(duration:A) then silence(duration:A)|{Recurs T}
+	       []U|F then
+		  {Transpose Semiton H}|{Recurs T}
 	       else {GetNote {GetNumber H}+Semiton}|{Recurs T}
 	       end
 	    []nil then nil
@@ -835,7 +837,6 @@ in
    %{Browse {Project.run Mix PartitionToTimedList [wave('pig.wav')] 'out.wav'}}
    {Browse {Project.run Mix PartitionToTimedList Music 'out.wav'}}
    %{Browse {Mix PartitionToTimedList Music}}
-   %{Browse {IsPartition}}
 
 
    
