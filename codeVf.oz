@@ -2,10 +2,14 @@ local
    % See project statement for API details.
    [Project] = {Link ['Project2018.ozf']}
    Time = {Link ['x-oz://boot/Time']}.1.getReferenceTime
+   %----------------------------------------------------------------------------------------------------
+   %Activer ou désactiver le lissage
+   Lissage = false
+   %----------------------------------------------------------------------------------------------------
 
-   Lissage = true
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+   
+   %----------------------------------------------------------------------------------------------------
+   %IsTrans renvoie true si X est une transformation
    fun{IsTrans X}
       if{Record.is X}then
 	 case X
@@ -18,13 +22,16 @@ local
       else false
       end
    end
-
+   %----------------------------------------------------------------------------------------------------
+   %IsNote renvoie true si X est une Note
    fun{IsNote X}
       if{Tuple.is X}then true
       elseif {Atom.is X}then true
       else false
       end
    end
+   %----------------------------------------------------------------------------------------------------
+   %IsExtNote renvoie true si X est une ExtendedNote
    fun{IsExtNote X}
       if{Record.is X} then
 	 case X
@@ -36,7 +43,8 @@ local
 	 false
       end  
    end
-
+   %----------------------------------------------------------------------------------------------------
+   %IsChord renvoie true si X est un accord
    fun{IsChord X} %ATTENTION SI IL RECOIT UNE PARTITION IL ENVOIE TRUE
       case X
       of H|T then
@@ -48,7 +56,8 @@ local
       else false
       end
    end
-
+   %----------------------------------------------------------------------------------------------------
+   %IsExtChord renvoie true si X est une Extended Chord
    fun{IsExtChord X} 
       case X %C'est ok selon l'enonce
       of H|T then
@@ -62,7 +71,9 @@ local
    end
 
 %---------------------ZONE DES TRANSFORMATIONS ----------------------
-
+%Ici nous écrivons toutes les transformations possibles sur une partition
+%---------------------------------------------------
+   %Transform dispatche les transformations vers leur sous fonction
    fun{Transform X}
       case X
       of duration(seconds:S B) then {Duration S B}%appel a la fct duration
@@ -73,6 +84,10 @@ local
       end
    end
 
+%---------------------------------------------------
+% Stretch
+% INPUT Fact , un facteur et Part, une partition (extpart ou non)
+% OUTPUT Chaque durée de note multipliée par le facteur
    fun{Stretch Fact Part}   
       local StretchExt in
 	 fun {StretchExt Fact EPart}
@@ -92,7 +107,10 @@ local
 	 {StretchExt Fact {PartitionToTimedList Part}}
       end%fin du local
    end   
-
+%---------------------------------------------------
+% GetDuration
+% INPUT Partition
+% OUTPUT Durée(secondes) de la partition
    fun {GetDuration List}
       local Accumulateur in
 	 fun{Accumulateur Acc Reste}
@@ -103,7 +121,10 @@ local
 	 {Accumulateur 0.0 {PartitionToTimedList List}}
       end
    end
-
+%---------------------------------------------------
+% Duration
+% INPUT Duree & Partition
+% OUTPUT Chaque durée de note modifiée pour que la partition soit de durée donnée
    fun {Duration Sec Part}
       local Fact in
 	 Fact = Sec / {GetDuration Part} %doit rendre un float!
@@ -125,7 +146,10 @@ local
 	 {Recurs 1}
       end%local
    end
-
+%---------------------------------------------------
+% Transpose
+% INPUT Partition, semiton
+% OUTPUT Partition, chaque note est transposée d'un nombre de semitons donné
    fun{Transpose Semiton Part} %Souci si j'ai un silence dans ma part.
       local Recurs in
 	 fun{Recurs Reste}
@@ -141,7 +165,10 @@ local
 	 {Recurs {PartitionToTimedList Part}}
       end%local
    end%fct
-
+%---------------------------------------------------
+% GetNumber
+% INPUT ExtendedNote
+% OUTPUT renvoie l'indice de la note dans notre système de classification
    fun {GetNumber ExtNote}
       case ExtNote.name of 'c' then 
 	 if ExtNote.sharp then 2+ 12*(ExtNote.octave-1) % do#
@@ -169,7 +196,10 @@ local
 	 12 + 12*(ExtNote.octave -1 ) %si
       end
    end
-
+%---------------------------------------------------
+% GetNote
+% INPUT Nombre entier
+% OUTPUT Renvoie la note associée (inverse de GetNumber)
    fun {GetNote I}
       local Tab Oct N IsSharp in
 	 fun{IsSharp U}
@@ -192,7 +222,10 @@ local
 
 %----------------------END ZONE DES TRANSFORMATIONS-------------------
 
-   % Translate a note to the extended notation.
+%---------------------------------------------------
+% NoteToExtended
+% INPUT Note
+% OUTPUT ExtNote
    fun{NoteToExtended Note}
       case Note
       of Name#Octave then
@@ -213,8 +246,11 @@ local
 	 
       end
    end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%---------------------------------------------------
+% ChordToExtended
+% INPUT Chord
+% OUTPUT ExtChord
    fun {ChordToExtended Chord}
       case Chord
       of nil then nil
@@ -229,6 +265,10 @@ local
 	 
       end
    end
+%---------------------------------------------------
+% PartitionToTimedList
+% INPUT Partition
+% OUTPUT Liste de ExtendedNote et ExtendedChord
 
    fun {PartitionToTimedList Partition}
       %NB: Partition est une liste [a1 a2 a3 a4]
@@ -411,7 +451,7 @@ local
 	    end
 	    
 	 end
-	 thread FACTOR = {Number.abs {FindHigh Liste}} end
+	 FACTOR = {Number.abs {FindHigh Liste}}
 	 if FACTOR > 1.0 then
 	    {Divide Liste FACTOR} %Fait Divide avec la Liste; {FindHigh Liste} permet de trouver par quel facteur il faut diviser
 	 else
@@ -623,7 +663,7 @@ local
 			A = {Recursive 0}
 
 			if Lissage then
-			   thread {Fade 0.1 0.1 A}end
+			   {Fade 0.1 0.1 A}
 			else
 			   
 			A
