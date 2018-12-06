@@ -8,7 +8,7 @@ local
    P1 = [a b c d [d f b]]
    P2 = [e f [a b3 c] g a3]
    P4 = [c d e f g a b [a] b]
-   P5 =  [c d e]
+   P5 =  [c b a]
 
    Rev =  reverse(Music4) %
    Rep =  repeat(amount:3 Music3) %OK  
@@ -23,7 +23,7 @@ local
    Dro = partition([ c c drone(note:e amount:4)])
    Tra = partition([c c transpose(semitones:5 P5)])
   
-
+in
    Rev =  reverse(Music4) %
    Rep =  repeat(amount:3 Music3) %OK  
    Loo =  loop(duration:5.0 Music3) %OK
@@ -36,9 +36,11 @@ local
    Dur = partition([ c c duration(duration:10.0 P1)])
    Dro = partition([ c c drone(note:e amount:4)])
    Tra = partition([c c transpose(semitones:5 P5)])
+  
 in
-
    [Rev Rep Loo Cli Ech Cut Fad Str Dur Dro Tra ]
+  
+in
    
    
   
